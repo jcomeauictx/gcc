@@ -1,9 +1,9 @@
 SHELL := /bin/bash
 all: _doprnt.test arraysnprintf.test
-%: %.o ./libiberty.a .FORCE
-	gcc $< -o $@ $(word 2, $+)
 %.o: %.c .FORCE
 	$(MAKE) CFLAGS='-DTEST=1' $@
+%: %.o ./libiberty.a .FORCE
+	gcc $< -o $@ $(word 2, $+)
 libiberty.a:
 	$(MAKE) libiberty.a
 %.test: %
