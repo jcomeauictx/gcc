@@ -33,7 +33,7 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #define COPY_VA_INT \
   do { \
-	 const int value = abs (va_arg (ap, int)); \
+	 const int value = abs (int*)(args++); \
 	 char buf[32]; \
 	 ptr++; /* Go past the asterisk.  */ \
 	 *sptr = '\0'; /* NULL terminate sptr.  */ \
@@ -52,7 +52,7 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 #define PRINT_TYPE(TYPE) \
   do { \
 	int result; \
-	TYPE value = va_arg (ap, TYPE); \
+	TYPE value = (TYPE) (args++); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = fprintf(stream, specifier, value); \
@@ -66,7 +66,7 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
       } while (0)
 
 int
-_doprnt (const char *format, va_list ap, FILE *stream)
+arraysnprintf (const char *format, void **args, char *formatted)
 {
   const char * ptr = format;
   char specifier[128];
@@ -212,14 +212,11 @@ _doprnt (const char *format, va_list ap, FILE *stream)
 static int checkit (const char * format, ...) ATTRIBUTE_PRINTF_1;
 
 static int
-checkit (const char* format, ...)
+checkit (const char* format, void **args)
 {
   int result;
-  va_list args;
-  va_start (args, format);
-
-  result = _doprnt (format, args, stdout);
-  va_end (args);
+  char[] formatted = char[1024];
+  result = arraysnprintf (format, args, formatted);
 
   return result;
 }
@@ -227,13 +224,13 @@ checkit (const char* format, ...)
 int
 main (void)
 {
-  RESULT(checkit, ("<%d>\n", 0x12345678));
+  RESULT(checkit, ("<%d>\n", [0x12345678]));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
 
-  RESULT(checkit, ("<%200d>\n", 5));
+  RESULT(checkit, ("<%200d>\n", [5]));
   RESULT(errprintf, ("<%200d>\n", 5));
 
-  RESULT(checkit, ("<%.300d>\n", 6));
+  RESULT(checkit, ("<%.300d>\n", [6]));
   RESULT(errprintf, ("<%.300d>\n", 6));
 
   RESULT(checkit, ("<%100.150d>\n", 7));
