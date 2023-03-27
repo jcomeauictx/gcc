@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-all: _doprnt.test arraysnprintf.test
+all: _doprnt.o _arraysnprintf.o _doprnt.test _arraysnprintf.test
 %.o: %.c .FORCE
 	$(MAKE) CFLAGS='-DTEST=1' $@
 %: %.o ./libiberty.a .FORCE

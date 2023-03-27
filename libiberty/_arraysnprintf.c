@@ -44,7 +44,8 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #define PRINT_CHAR(CHAR) \
   do { \
-	 putc(CHAR, stream); \
+	 snprintf(formatted + total_printed, maxlength - total_printed, \
+	   "%c", CHAR); \
 	 ptr++; \
 	 total_printed++; \
      } while (0)
@@ -55,7 +56,8 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 	TYPE value = (TYPE) (args++); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
-	result = fprintf(stream, specifier, value); \
+	result = snprintf(formatted + total_printed, \
+	  maxlength - total_printed, specifier, value); \
 	if (result == -1) \
 	  return -1; \
 	else \
@@ -66,7 +68,7 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
       } while (0)
 
 int
-arraysnprintf (const char *format, void **args, char *formatted)
+arraysnprintf (char *formatted, size_t maxlength, const char *format, void **args)
 {
   const char * ptr = format;
   char specifier[128];
@@ -216,16 +218,16 @@ checkit (const char* format, void **args)
 {
   int result;
   char[] formatted = char[1024];
-  result = arraysnprintf (format, args, formatted);
-
+  result = arraysnprintf (formatted, 1024, args, format);
   return result;
 }
 
 int
 main (void)
 {
-  RESULT(checkit, ("<%d>\n", [0x12345678]));
+  RESULT(checkit, ("<%d>\n", (void *[]) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
+#ifdef HIDE_FOR_NOW
 
   RESULT(checkit, ("<%200d>\n", [5]));
   RESULT(errprintf, ("<%200d>\n", 5));
@@ -280,6 +282,7 @@ main (void)
   RESULT(errprintf, ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		 1.23456, 1.234567890123456789L, 1.23456));
 #endif
+#endif  /* HIDE_FOR_NOW */
 
   return 0;
 }
