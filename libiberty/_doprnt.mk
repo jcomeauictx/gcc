@@ -1,10 +1,11 @@
 SHELL := /bin/bash
-_doprnt: _doprnt.o ./libiberty.a .FORCE
+all: _doprnt.test arraysnprintf.test
+%: %.o ./libiberty.a .FORCE
 	gcc $< -o $@ $(word 2, $+)
-_doprnt.o: .FORCE
-	$(MAKE) CFLAGS='-DTEST=1' _doprnt.o
+%.o: %.c .FORCE
+	$(MAKE) CFLAGS='-DTEST=1' $@
 libiberty.a:
 	$(MAKE) libiberty.a
-test: _doprnt
+%.test: %
 	diff <(./$< 2>&1 >/dev/null) <(./$< 2>/dev/null)
 .FORCE:
