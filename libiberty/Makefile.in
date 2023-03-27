@@ -124,7 +124,7 @@ COMPILE.c = $(CC) -c @DEFS@ $(CFLAGS) $(CPPFLAGS) -I. -I$(INCDIR) \
 # (alphabetical), and add them to REQUIRED_OFILES, or
 # CONFIGURED_OFILES and funcs in configure.ac.  Also run "make maint-deps"
 # to build the new rules.
-CFILES = alloca.c argv.c arraysnprintf.c asprintf.c atexit.c		\
+CFILES = alloca.c argv.c asprintf.c atexit.c				\
 	basename.c bcmp.c bcopy.c bsearch.c bsearch_r.c bzero.c		\
 	calloc.c choose-temp.c clock.c concat.c cp-demangle.c		\
 	 cp-demint.c cplus-dem.c crc32.c				\
@@ -572,16 +572,6 @@ $(CONFIGURED_OFILES): stamp-picdir stamp-noasandir
 	else true; fi
 	$(COMPILE.c) $(srcdir)/argv.c $(OUTPUT_OPTION)
 
-./arraysnprintf.$(objext): $(srcdir)/arraysnprintf.c config.h \
-	$(INCDIR)/ansidecl.h $(INCDIR)/safe-ctype.h
-	if [ x"$(PICFLAG)" != x ]; then \
-	  $(COMPILE.c) $(PICFLAG) $(srcdir)/arraysnprintf.c -o pic/$@; \
-	else true; fi
-	if [ x"$(NOASANFLAG)" != x ]; then \
-	  $(COMPILE.c) $(PICFLAG) $(NOASANFLAG) $(srcdir)/arraysnprintf.c -o noasan/$@; \
-	else true; fi
-	$(COMPILE.c) $(srcdir)/arraysnprintf.c $(OUTPUT_OPTION)
-
 ./asprintf.$(objext): $(srcdir)/asprintf.c config.h $(INCDIR)/ansidecl.h \
 	$(INCDIR)/libiberty.h
 	if [ x"$(PICFLAG)" != x ]; then \
@@ -806,8 +796,8 @@ $(CONFIGURED_OFILES): stamp-picdir stamp-noasandir
 	else true; fi
 	$(COMPILE.c) $(srcdir)/fibheap.c $(OUTPUT_OPTION)
 
-./filedescriptor.$(objext): $(srcdir)/filedescriptor.c config.h \
-	$(INCDIR)/ansidecl.h $(INCDIR)/libiberty.h
+./filedescriptor.$(objext): $(srcdir)/filedescriptor.c config.h $(INCDIR)/ansidecl.h \
+	$(INCDIR)/libiberty.h
 	if [ x"$(PICFLAG)" != x ]; then \
 	  $(COMPILE.c) $(PICFLAG) $(srcdir)/filedescriptor.c -o pic/$@; \
 	else true; fi
@@ -816,8 +806,9 @@ $(CONFIGURED_OFILES): stamp-picdir stamp-noasandir
 	else true; fi
 	$(COMPILE.c) $(srcdir)/filedescriptor.c $(OUTPUT_OPTION)
 
+
 ./filename_cmp.$(objext): $(srcdir)/filename_cmp.c config.h $(INCDIR)/ansidecl.h \
-	$(INCDIR)/filenames.h $(INCDIR)/hashtab.h $(INCDIR)/libiberty.h \
+	$(INCDIR)/filenames.h $(INCDIR)/hashtab.h \
 	$(INCDIR)/safe-ctype.h
 	if [ x"$(PICFLAG)" != x ]; then \
 	  $(COMPILE.c) $(PICFLAG) $(srcdir)/filename_cmp.c -o pic/$@; \
@@ -1164,8 +1155,7 @@ $(CONFIGURED_OFILES): stamp-picdir stamp-noasandir
 	$(COMPILE.c) $(srcdir)/pex-one.c $(OUTPUT_OPTION)
 
 ./pex-unix.$(objext): $(srcdir)/pex-unix.c config.h $(INCDIR)/ansidecl.h \
-	$(INCDIR)/environ.h $(INCDIR)/libiberty.h \
-	$(srcdir)/pex-common.h
+	$(INCDIR)/libiberty.h $(srcdir)/pex-common.h
 	if [ x"$(PICFLAG)" != x ]; then \
 	  $(COMPILE.c) $(PICFLAG) $(srcdir)/pex-unix.c -o pic/$@; \
 	else true; fi
@@ -1271,8 +1261,7 @@ $(CONFIGURED_OFILES): stamp-picdir stamp-noasandir
 	else true; fi
 	$(COMPILE.c) $(srcdir)/safe-ctype.c $(OUTPUT_OPTION)
 
-./setenv.$(objext): $(srcdir)/setenv.c config.h $(INCDIR)/ansidecl.h \
-	$(INCDIR)/environ.h
+./setenv.$(objext): $(srcdir)/setenv.c config.h $(INCDIR)/ansidecl.h
 	if [ x"$(PICFLAG)" != x ]; then \
 	  $(COMPILE.c) $(PICFLAG) $(srcdir)/setenv.c -o pic/$@; \
 	else true; fi
@@ -1723,7 +1712,7 @@ $(CONFIGURED_OFILES): stamp-picdir stamp-noasandir
 	$(COMPILE.c) $(srcdir)/xexit.c $(OUTPUT_OPTION)
 
 ./xmalloc.$(objext): $(srcdir)/xmalloc.c config.h $(INCDIR)/ansidecl.h \
-	$(INCDIR)/environ.h $(INCDIR)/libiberty.h
+	$(INCDIR)/libiberty.h
 	if [ x"$(PICFLAG)" != x ]; then \
 	  $(COMPILE.c) $(PICFLAG) $(srcdir)/xmalloc.c -o pic/$@; \
 	else true; fi
@@ -1781,4 +1770,3 @@ $(CONFIGURED_OFILES): stamp-picdir stamp-noasandir
 	  $(COMPILE.c) $(PICFLAG) $(NOASANFLAG) $(srcdir)/xvasprintf.c -o noasan/$@; \
 	else true; fi
 	$(COMPILE.c) $(srcdir)/xvasprintf.c $(OUTPUT_OPTION)
-
