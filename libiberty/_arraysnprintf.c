@@ -31,9 +31,11 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 #include <stdlib.h>
 #endif
 
+int errprintf(const char *format, ...);
+
 #define COPY_VA_INT \
   do { \
-	 const int value = abs((int)(*args++)); \
+	 const int value = abs((int)(args++)); \
 	 char buf[32]; \
 	 ptr++; /* Go past the asterisk.  */ \
 	 *sptr = '\0'; /* NULL terminate sptr.  */ \
@@ -53,7 +55,8 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 #define PRINT_TYPE(TYPE) \
   do { \
 	int result; \
-	TYPE value = (TYPE) (*args++); \
+	TYPE value = (TYPE) (args++); \
+	errprintf("VALUE AT 0x%08x: 0x%08x\n", &value, value); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = snprintf(formatted + total_printed, \
@@ -222,7 +225,6 @@ checkit (const char* format, long *args)
   return result;
 }
 
-int errprintf(const char *format, ...);
 int errprintf(const char *format, ...)
 {
   int result;
