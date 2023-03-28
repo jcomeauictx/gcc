@@ -222,7 +222,16 @@ checkit (const char* format, long *args)
   return result;
 }
 
-#define errprintf(...) fprintf(stderr, __VA_ARGS__)
+int errprintf(const char *format, ...);
+int errprintf(const char *format, ...)
+{
+  int result;
+  va_list args;
+  va_start(args, format);
+  result = vfprintf(stderr, format, args);
+  va_end(args);
+  return result;
+}
 
 int
 main (void)
