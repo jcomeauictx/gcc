@@ -208,7 +208,7 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 #define RESULT(x, ...) do \
 { \
     int i = x __VA_ARGS__; \
-    x ("printed %d characters\n", x == checkit ? (int[]){i} : i); \
+    x ("printed %d characters\n", x == checkit ? (long[]){i} : i); \
     fflush(stdin); \
 } while (0)
 
@@ -220,7 +220,7 @@ checkit (const char* format, long *args)
   int result;
   char formatted[1024] = "";
   result = _arraysnprintf (formatted, 1024, format, args);
-  printf("%s\n", formatted);
+  printf("%s", formatted);  /* avoid double newline */
   return result;
 }
 
