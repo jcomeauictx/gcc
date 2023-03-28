@@ -35,8 +35,9 @@ int errprintf(const char *format, ...);
 
 #define COPY_VA_INT \
   do { \
-	 const int value = abs((int)(args++)); \
+	 const int value = (int *)(args++); \
 	 char buf[32]; \
+	 errprintf("COPY_VA_INT called\n"); \
 	 ptr++; /* Go past the asterisk.  */ \
 	 *sptr = '\0'; /* NULL terminate sptr.  */ \
 	 sprintf(buf, "%d", value); \
@@ -46,6 +47,7 @@ int errprintf(const char *format, ...);
 
 #define PRINT_CHAR(CHAR) \
   do { \
+	 errprintf("PRINT_CHAR(%c) called\n", CHAR); \
 	 *(formatted + total_printed++) = *ptr++; \
      } while (0)
 
