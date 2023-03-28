@@ -55,7 +55,7 @@ int errprintf(const char *format, ...);
 	int result; \
 	long addr = &args; \
 	TYPE value = (TYPE) (args++); \
-	errprintf("VALUE AT 0x%08x: 0x%08x\n", addr, value); \
+	errprintf("VALUE AT %p: 0x%016x\n", addr, value); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = snprintf(formatted + total_printed, \
