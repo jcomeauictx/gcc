@@ -47,15 +47,15 @@ int errprintf(const char *format, ...);
 
 #define PRINT_CHAR(CHAR) \
   do { \
-	 errprintf("PRINT_CHAR('%c') called\n", CHAR); \
 	 *(formatted + total_printed++) = *ptr++; \
      } while (0)
 
 #define PRINT_TYPE(TYPE) \
   do { \
 	int result; \
+	long addr = &args; \
 	TYPE value = (TYPE) (args++); \
-	errprintf("VALUE AT 0x%08x: 0x%08x\n", &value, value); \
+	errprintf("VALUE AT 0x%08x: 0x%08x\n", addr, value); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = snprintf(formatted + total_printed, \
