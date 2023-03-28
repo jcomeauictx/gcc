@@ -46,10 +46,7 @@ int errprintf(const char *format, ...);
 
 #define PRINT_CHAR(CHAR) \
   do { \
-	 snprintf(formatted + total_printed, maxlength - total_printed, \
-	   "%c", CHAR); \
-	 ptr++; \
-	 total_printed++; \
+	 *(formatted + total_printed++) = *ptr++; \
      } while (0)
 
 #define PRINT_TYPE(TYPE) \
