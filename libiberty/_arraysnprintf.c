@@ -47,7 +47,7 @@ int errprintf(const char *format, ...);
 
 #define PRINT_CHAR(CHAR) \
   do { \
-	 errprintf("PRINT_CHAR(%c) called\n", CHAR); \
+	 errprintf("PRINT_CHAR('%c') called\n", CHAR); \
 	 *(formatted + total_printed++) = *ptr++; \
      } while (0)
 
@@ -219,7 +219,7 @@ checkit (const char* format, long *args)
 {
   int result;
   char formatted[1024] = "";
-  result = _arraysnprintf (formatted, 1024, args, format);
+  result = _arraysnprintf (formatted, 1024, format, args);
   printf("%s\n", formatted);
   return result;
 }
