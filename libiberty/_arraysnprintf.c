@@ -2,7 +2,7 @@
    than a va_list, and using a buffer of fixed size. Based on _doprnt.c,
    Copyright (C) 1998-2023 Free Software Foundation, Inc.
    Contributed by Kaveh Ghazi  (ghazi@caip.rutgers.edu)  3/29/98
-   arraysnprintf.c edits by John Comeau <jc@unternet.net> 2023-03-25
+   _arraysnprintf.c edits by John Comeau <jc@unternet.net> 2023-03-25
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -33,7 +33,7 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #define COPY_VA_INT \
   do { \
-	 const int value = abs (int*)(args++); \
+	 const int value = abs((int)(*args++)); \
 	 char buf[32]; \
 	 ptr++; /* Go past the asterisk.  */ \
 	 *sptr = '\0'; /* NULL terminate sptr.  */ \
@@ -53,7 +53,7 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 #define PRINT_TYPE(TYPE) \
   do { \
 	int result; \
-	TYPE value = (TYPE) (args++); \
+	TYPE value = (TYPE) (*args++); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = snprintf(formatted + total_printed, \
@@ -68,7 +68,8 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
       } while (0)
 
 int
-arraysnprintf (char *formatted, size_t maxlength, const char *format, void **args)
+_arraysnprintf (char *formatted, size_t maxlength, const char *format,
+	       	long *args)
 {
   const char * ptr = format;
   char specifier[128];
@@ -150,9 +151,9 @@ arraysnprintf (char *formatted, size_t maxlength, const char *format, void **arg
 		      case 2:
 		      default:
 #if defined(__GNUC__) || defined(HAVE_LONG_LONG)
-			PRINT_TYPE(long long);
+			PRINT_TYPE(long long *);
 #else
-			PRINT_TYPE(long); /* Fake it and hope for the best.  */
+			PRINT_TYPE(long *); /* Fake it, hope for the best.  */
 #endif
 			break;
 		      } /* End of switch (wide_width) */
@@ -166,13 +167,13 @@ arraysnprintf (char *formatted, size_t maxlength, const char *format, void **arg
 	    case 'G':
 	      {
 		if (wide_width == 0)
-		  PRINT_TYPE(double);
+		  PRINT_TYPE(double *);
 		else
 		  {
 #if defined(__GNUC__) || defined(HAVE_LONG_DOUBLE)
-		    PRINT_TYPE(long double);
+		    PRINT_TYPE(long double *);
 #else
-		    PRINT_TYPE(double); /* Fake it and hope for the best.  */
+		    PRINT_TYPE(double *); /* Fake it and hope for the best.  */
 #endif
 		  }
 	      }
@@ -205,30 +206,31 @@ arraysnprintf (char *formatted, size_t maxlength, const char *format, void **arg
 #define RESULT(x, ...) do \
 { \
     int i = x __VA_ARGS__; \
-    x ("printed %d characters\n", i); \
+    x ("printed %d characters\n", x == checkit ? (int[]){i} : i); \
     fflush(stdin); \
 } while (0)
 
-#define errprintf(...) fprintf(stderr, __VA_ARGS__)
-
-static int checkit (const char * format, ...) ATTRIBUTE_PRINTF_1;
+static int checkit (const char * format, long *args);
 
 static int
-checkit (const char* format, void **args)
+checkit (const char* format, long *args)
 {
   int result;
-  char[] formatted = char[1024];
-  result = arraysnprintf (formatted, 1024, args, format);
+  char formatted[1024] = "";
+  result = _arraysnprintf (formatted, 1024, args, format);
+  printf("%s\n", formatted);
   return result;
 }
+
+#define errprintf(...) fprintf(stderr, __VA_ARGS__)
 
 int
 main (void)
 {
-  RESULT(checkit, ("<%d>\n", (void *[]) {0x12345678}));
+  RESULT(checkit, ("<%d>\n", (long []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
-#ifdef HIDE_FOR_NOW
 
+#ifdef HIDE_FOR_NOW
   RESULT(checkit, ("<%200d>\n", [5]));
   RESULT(errprintf, ("<%200d>\n", 5));
 
