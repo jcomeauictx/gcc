@@ -1,11 +1,4 @@
-libiberty/Makefile
-libiberty/_doprnt
-libiberty/config.h
-libiberty/testsuite/Makefile
 *.o
 *.log
 *.status
 *.a
-libiberty/stamp-h
-libiberty/stamp-noasandir
-libiberty/stamp-picdir

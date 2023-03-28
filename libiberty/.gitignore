@@ -1,2 +1,10 @@
+Makefile
+_doprnt
+_arraysnprintf
+config.h
+testsuite/Makefile
+stamp-h
+stamp-noasandir
+stamp-picdir
 /required-list
 /xhost-mkfrag
