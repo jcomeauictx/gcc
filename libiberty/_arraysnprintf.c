@@ -236,10 +236,13 @@ int
 main (void)
 {
   const double PI = M_PI;  /* needed for some tests below */
+  const double *pi = &PI;  /* because the above doesn't work */
   errprintf("&PI: %p, PI: %.16f (double *)&PI: %.16f\n",
 	    &PI, PI, (double *)&PI);
   printf("&PI: %p, PI: %.16f (double *)&PI: %.16f\n",
 	    &PI, PI, (double *)&PI);
+  errprintf("pi: %p, *pi: %.16f\n", pi, *pi);
+  printf("pi: %p, *pi: %.16f\n", pi, *pi);
 
   RESULT(checkit, ("<%d>\n", (long []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
@@ -268,7 +271,7 @@ main (void)
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
 
   RESULT(checkit, ("<%4f><%.4f><%%><%4.4f>\n",
-		  (long []) {(long)&PI, (long)&PI, (long)&PI}));
+		  (long []) {(long)pi, (long)pi, (long)pi}));
   RESULT(errprintf, ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
 
 #ifdef HIDE_FOR_NOW
