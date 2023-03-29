@@ -53,10 +53,9 @@ int errprintf(const char *format, ...);
 #define PRINT_TYPE(TYPE) \
   do { \
 	int result; \
-	long addr = &args; \
-	TYPE value = (TYPE) (args++); \
-	errprintf("VALUE AT %p: 0x%016x\n", addr, value); \
-	printf("VALUE AT %p: 0x%016x\n", addr, value); \
+	TYPE value = (TYPE) (*args++); \
+	errprintf("VALUE AT %p: 0x%016x\n", args, value); \
+	printf("VALUE AT %p: 0x%016x\n", args, value); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = snprintf(formatted + total_printed, \
