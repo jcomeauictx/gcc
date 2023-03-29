@@ -167,13 +167,13 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 	    case 'G':
 	      {
 		if (wide_width == 0)
-		  PRINT_TYPE(double *);
+		  PRINT_TYPE(double);
 		else
 		  {
 #if defined(__GNUC__) || defined(HAVE_LONG_DOUBLE)
 		    PRINT_TYPE(long double *);
 #else
-		    PRINT_TYPE(double *); /* Fake it and hope for the best.  */
+		    PRINT_TYPE(double); /* Fake it and hope for the best.  */
 #endif
 		  }
 	      }
@@ -255,12 +255,13 @@ main (void)
 		 "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"));
 
-#ifdef HIDE_FOR_NOW
-  RESULT(checkit, ("<%f><%0+#f>%s%d%s>\n",
-		  1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
+  RESULT(checkit, ("<%f><%0+#f>%s%d%s>\n", (long []) {
+		  (long)1.0, (long)1.0, (long) "foo", 77,
+		  (long) "asdjffffffffffffffiiiiiiiiiiixxxxx"}));
   RESULT(errprintf, ("<%f><%0+#f>%s%d%s>\n",
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
 
+#ifdef HIDE_FOR_NOW
   RESULT(checkit, ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
   RESULT(errprintf, ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
 
