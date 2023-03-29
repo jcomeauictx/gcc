@@ -1,4 +1,4 @@
-/* Provide a version of sprintf that uses an array of pointers rather
+/* Provide a version of sprintf that uses an array of longs/pointers rather
    than a va_list, and using a buffer of fixed size. Based on _doprnt.c,
    Copyright (C) 1998-2023 Free Software Foundation, Inc.
    Contributed by Kaveh Ghazi  (ghazi@caip.rutgers.edu)  3/29/98
@@ -241,13 +241,13 @@ main (void)
   RESULT(checkit, ("<%200d>\n", (long []) {5}));
   RESULT(errprintf, ("<%200d>\n", 5));
 
-#ifdef HIDE_FOR_NOW
-  RESULT(checkit, ("<%.300d>\n", [6]));
+  RESULT(checkit, ("<%.300d>\n", (long []) {6}));
   RESULT(errprintf, ("<%.300d>\n", 6));
 
-  RESULT(checkit, ("<%100.150d>\n", 7));
+  RESULT(checkit, ("<%100.150d>\n", (long []) {7}));
   RESULT(errprintf, ("<%100.150d>\n", 7));
 
+#ifdef HIDE_FOR_NOW
   RESULT(checkit, ("<%s>\n",
 		  "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"));
