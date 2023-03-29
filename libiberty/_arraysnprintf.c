@@ -261,10 +261,11 @@ main (void)
   RESULT(errprintf, ("<%f><%0+#f>%s%d%s>\n",
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
 
-#ifdef HIDE_FOR_NOW
-  RESULT(checkit, ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
+  RESULT(checkit, ("<%4f><%.4f><%%><%4.4f>\n",
+		  (long []) {(long)M_PI, (long)M_PI, (long)M_PI}));
   RESULT(errprintf, ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
 
+#ifdef HIDE_FOR_NOW
   RESULT(checkit, ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
   RESULT(errprintf, ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
 
