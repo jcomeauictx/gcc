@@ -248,7 +248,7 @@ main (void)
   RESULT(errprintf, ("<%100.150d>\n", 7));
 
   RESULT(checkit, ("<%s>\n", (long [])
-		  {(long)"jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\777777777777777777333333333333366666666666622222222222777777777777733333"}));
+		  {(long)"jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n777777777777777777333333333333366666666666622222222222777777777777733333"}));
   RESULT(errprintf, ("<%s>\n",
 		 "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"));
