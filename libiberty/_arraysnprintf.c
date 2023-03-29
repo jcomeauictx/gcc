@@ -54,8 +54,6 @@ int errprintf(const char *format, ...);
   do { \
 	int result; \
 	TYPE value = (TYPE) (*args++); \
-	errprintf("VALUE AT %p: 0x%016x\n", args, value); \
-	printf("VALUE AT %p: 0x%016x\n", args, value); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = snprintf(formatted + total_printed, \
@@ -77,8 +75,6 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
   char specifier[128];
   int total_printed = 0;
   
-  errprintf("args: %p, *args: 0x%016lx, args[0]: 0x%016lx\n", args, *args, args[0]);
-  printf("args: %p, *args: 0x%016lx, args[0]: 0x%016lx\n", args, *args, args[0]);
   while (*ptr != '\0')
     {
       if (*ptr != '%') /* While we have regular characters, print them.  */
