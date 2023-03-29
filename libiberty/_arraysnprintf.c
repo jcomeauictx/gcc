@@ -236,8 +236,10 @@ int
 main (void)
 {
   const double PI = M_PI;  /* needed for some tests below */
-  errprintf("&PI: %p, PI: %.16f\n", &PI, (double *)&PI);
-  printf("&PI: %p, PI: %.16f\n", &PI, (double *)&PI);
+  errprintf("&PI: %p, PI: %.16f (double *)&PI: %.16f\n",
+	    &PI, PI, (double *)&PI);
+  printf("&PI: %p, PI: %.16f (double *)&PI: %.16f\n",
+	    &PI, PI, (double *)&PI);
 
   RESULT(checkit, ("<%d>\n", (long []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
