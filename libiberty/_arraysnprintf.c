@@ -238,10 +238,10 @@ main (void)
   RESULT(checkit, ("<%d>\n", (long []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
 
-#ifdef HIDE_FOR_NOW
-  RESULT(checkit, ("<%200d>\n", [5]));
+  RESULT(checkit, ("<%200d>\n", (long []) {5}));
   RESULT(errprintf, ("<%200d>\n", 5));
 
+#ifdef HIDE_FOR_NOW
   RESULT(checkit, ("<%.300d>\n", [6]));
   RESULT(errprintf, ("<%.300d>\n", 6));
 
