@@ -33,11 +33,11 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 int errprintf(const char *format, ...);
 
-#define COPY_VA_INT \
+#define COPY_INT \
   do { \
 	 const int value = (int *)(args++); \
 	 char buf[32]; \
-	 errprintf("COPY_VA_INT called\n"); \
+	 errprintf("COPY_INT called\n"); \
 	 ptr++; /* Go past the asterisk.  */ \
 	 *sptr = '\0'; /* NULL terminate sptr.  */ \
 	 sprintf(buf, "%d", value); \
@@ -56,6 +56,7 @@ int errprintf(const char *format, ...);
 	long addr = &args; \
 	TYPE value = (TYPE) (args++); \
 	errprintf("VALUE AT %p: 0x%016x\n", addr, value); \
+	printf("VALUE AT %p: 0x%016x\n", addr, value); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = snprintf(formatted + total_printed, \
@@ -92,7 +93,7 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 	    *sptr++ = *ptr++;
 
 	  if (*ptr == '*')
-	    COPY_VA_INT;
+	    COPY_INT;
 	  else
 	    while (ISDIGIT(*ptr)) /* Handle explicit numeric value.  */
 	      *sptr++ = *ptr++;
@@ -101,7 +102,7 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 	    {
 	      *sptr++ = *ptr++; /* Copy and go past the period.  */
 	      if (*ptr == '*')
-		COPY_VA_INT;
+		COPY_INT;
 	      else
 		while (ISDIGIT(*ptr)) /* Handle explicit numeric value.  */
 		  *sptr++ = *ptr++;
