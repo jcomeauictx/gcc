@@ -247,14 +247,13 @@ main (void)
   RESULT(checkit, ("<%100.150d>\n", (long []) {7}));
   RESULT(errprintf, ("<%100.150d>\n", 7));
 
-#ifdef HIDE_FOR_NOW
-  RESULT(checkit, ("<%s>\n",
-		  "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
-777777777777777777333333333333366666666666622222222222777777777777733333"));
+  RESULT(checkit, ("<%s>\n", (long [])
+		  {(long)"jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\777777777777777777333333333333366666666666622222222222777777777777733333"}));
   RESULT(errprintf, ("<%s>\n",
 		 "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"));
 
+#ifdef HIDE_FOR_NOW
   RESULT(checkit, ("<%f><%0+#f>%s%d%s>\n",
 		  1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
   RESULT(errprintf, ("<%f><%0+#f>%s%d%s>\n",
