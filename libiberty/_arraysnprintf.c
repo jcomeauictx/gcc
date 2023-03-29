@@ -78,6 +78,8 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
   char specifier[128];
   int total_printed = 0;
   
+  errprintf("args: %p, *args: 0x%016lx, args[0]: 0x%016lx\n", args, *args, args[0]);
+  printf("args: %p, *args: 0x%016lx, args[0]: 0x%016lx\n", args, *args, args[0]);
   while (*ptr != '\0')
     {
       if (*ptr != '%') /* While we have regular characters, print them.  */
