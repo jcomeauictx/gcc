@@ -167,13 +167,13 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 	    case 'G':
 	      {
 		if (wide_width == 0)
-		  PRINT_TYPE(double);
+		  PRINT_TYPE(double *);
 		else
 		  {
 #if defined(__GNUC__) || defined(HAVE_LONG_DOUBLE)
 		    PRINT_TYPE(long double *);
 #else
-		    PRINT_TYPE(double); /* Fake it and hope for the best.  */
+		    PRINT_TYPE(double *); /* Fake it and hope for the best.  */
 #endif
 		  }
 	      }
@@ -235,6 +235,10 @@ int errprintf(const char *format, ...)
 int
 main (void)
 {
+  const double PI = M_PI;  /* needed for some tests below */
+  errprintf("&PI: %p, PI: %.16f\n", &PI, (double *)&PI);
+  printf("&PI: %p, PI: %.16f\n", &PI, (double *)&PI);
+
   RESULT(checkit, ("<%d>\n", (long []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
 
@@ -262,7 +266,7 @@ main (void)
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
 
   RESULT(checkit, ("<%4f><%.4f><%%><%4.4f>\n",
-		  (long []) {(long)M_PI, (long)M_PI, (long)M_PI}));
+		  (long []) {(long)&PI, (long)&PI, (long)&PI}));
   RESULT(errprintf, ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
 
 #ifdef HIDE_FOR_NOW
