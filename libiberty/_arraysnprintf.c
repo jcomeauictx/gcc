@@ -53,7 +53,7 @@ int errprintf(const char *format, ...);
 #define PRINT_TYPE(TYPE) \
   do { \
 	int result; TYPE value; \
-	if (strcmp("double", #TYPE) == 0) value = (TYPE) *(TYPE *)args++; \
+	if (strcmp("double", #TYPE) == 0) value = *(TYPE *)args++; \
 	else value = (TYPE) (*args++); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
