@@ -173,7 +173,7 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 #if defined(__GNUC__) || defined(HAVE_LONG_DOUBLE)
 		    PRINT_TYPE(long double *);
 #else
-		    PRINT_TYPE(double *); /* Fake it and hope for the best.  */
+		    PRINT_TYPE(double *); /* Hope for the best.  */
 #endif
 		  }
 	      }
@@ -235,14 +235,11 @@ int errprintf(const char *format, ...)
 int
 main (void)
 {
-  const double PI = M_PI;  /* needed for some tests below */
-  const double *pi = &PI;  /* because the above doesn't work */
-  errprintf("&PI: %p, PI: %.16f (double *)&PI: %.16f\n",
-	    &PI, PI, (double *)&PI);
-  printf("&PI: %p, PI: %.16f (double *)&PI: %.16f\n",
-	    &PI, PI, (double *)&PI);
-  errprintf("pi: %p, *pi: %.16f\n", pi, *pi);
-  printf("pi: %p, *pi: %.16f\n", pi, *pi);
+  /* constants needed for some tests below */
+  const double PI = M_PI;
+  const double *pi = &PI;
+  const double ONE = 1.0;
+  const double *one = &ONE;
 
   RESULT(checkit, ("<%d>\n", (long []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
@@ -265,7 +262,7 @@ main (void)
 777777777777777777333333333333366666666666622222222222777777777777733333"));
 
   RESULT(checkit, ("<%f><%0+#f>%s%d%s>\n", (long []) {
-		  (long)1.0, (long)1.0, (long) "foo", 77,
+		  (long)one, (long)one, (long) "foo", 77,
 		  (long) "asdjffffffffffffffiiiiiiiiiiixxxxx"}));
   RESULT(errprintf, ("<%f><%0+#f>%s%d%s>\n",
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
