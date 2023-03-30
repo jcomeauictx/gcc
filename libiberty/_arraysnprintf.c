@@ -53,7 +53,7 @@ int errprintf(const char *format, ...);
 #define PRINT_TYPE(TYPE) \
   do { \
 	int result; TYPE value; \
-	if (strcmp("double", #TYPE) == 0) value = (TYPE) (*(*args++)); \
+	if (strcmp("double", #TYPE) == 0) value = (TYPE) *(TYPE *)args++; \
 	else value = (TYPE) (*args++); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
@@ -152,9 +152,9 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 		      case 2:
 		      default:
 #if defined(__GNUC__) || defined(HAVE_LONG_LONG)
-			PRINT_TYPE(long long *);
+			PRINT_TYPE(long long);
 #else
-			PRINT_TYPE(long *); /* Fake it, hope for the best.  */
+			PRINT_TYPE(long); /* Fake it, hope for the best.  */
 #endif
 			break;
 		      } /* End of switch (wide_width) */
