@@ -52,9 +52,7 @@ int errprintf(const char *format, ...);
 
 #define PRINT_TYPE(TYPE) \
   do { \
-	int result; TYPE value; \
-	if (strcmp("double", #TYPE) == 0) value = (TYPE) *args++; \
-	else value = (TYPE) *args++; \
+	int result; TYPE value = (TYPE) *args++; \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = snprintf(formatted + total_printed, \
@@ -263,7 +261,6 @@ main (void)
 		 "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"));
 
-#ifdef HIDE_FOR_NOW
   RESULT(checkit, ("<%f><%0+#f>%s%d%s>\n", (void * []) {
 		  (void *)one, (void *)one, (void *) "foo", 77,
 		  (void *) "asdjffffffffffffffiiiiiiiiiiixxxxx"}));
@@ -274,19 +271,21 @@ main (void)
 		  (void * []) {(void *)pi, (void *)pi, (void *)pi}));
   RESULT(errprintf, ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
 
-  RESULT(checkit, ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
+  RESULT(checkit, ("<%*f><%.*f><%%><%*.*f>\n",
+		  (void * []) {3, (void *)pi, 3, (void *)pi, 3, 3, (void *)pi}));
   RESULT(errprintf, ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
 
   RESULT(checkit, ("<%d><%i><%o><%u><%x><%X><%c>\n",
-		  75, 75, 75, 75, 75, 75, 75));
+		  (void * []) {75, 75, 75, 75, 75, 75, 75}));
   RESULT(errprintf, ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		 75, 75, 75, 75, 75, 75, 75));
 
   RESULT(checkit, ("<%d><%i><%o><%u><%x><%X><%c>\n",
-		  75, 75, 75, 75, 75, 75, 75));
+		  (void * []) {75, 75, 75, 75, 75, 75, 75}));
   RESULT(errprintf, ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		 75, 75, 75, 75, 75, 75, 75));
 
+#ifdef HIDE_FOR_NOW
   RESULT(checkit, ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
   RESULT(errprintf, ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
 
