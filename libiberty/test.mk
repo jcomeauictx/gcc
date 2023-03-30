@@ -8,4 +8,7 @@ libiberty.a:
 	$(MAKE) libiberty.a
 %.test: %
 	diff <(./$< 2>&1 >/dev/null) <(./$< 2>/dev/null)
+%.cpp: %.c
+	# show preprocessor output
+	gcc -E -I. -I../include $< | less
 .FORCE:
