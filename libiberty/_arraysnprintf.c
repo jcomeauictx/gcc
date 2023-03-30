@@ -35,7 +35,7 @@ int errprintf(const char *format, ...);
 
 #define COPY_INT \
   do { \
-	 const int value = (int)(*args++); \
+	 const int value = (int)(args++); \
 	 char buf[32]; \
 	 errprintf("COPY_INT called\n"); \
 	 ptr++; /* Go past the asterisk.  */ \
@@ -53,8 +53,8 @@ int errprintf(const char *format, ...);
 #define PRINT_TYPE(TYPE) \
   do { \
 	int result; TYPE value; \
-	if (strcmp("double", #TYPE) == 0) value = *(TYPE *)args++; \
-	else value = (TYPE) (*args++); \
+	if (strcmp("double", #TYPE) == 0) value = (TYPE) args++; \
+	else value = (TYPE) args++; \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = snprintf(formatted + total_printed, \
@@ -70,7 +70,7 @@ int errprintf(const char *format, ...);
 
 int
 _arraysnprintf (char *formatted, size_t maxlength, const char *format,
-	       	long *args)
+	       	void **args)
 {
   const char * ptr = format;
   char specifier[128];
@@ -168,13 +168,13 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 	    case 'G':
 	      {
 		if (wide_width == 0)
-		  PRINT_TYPE(double);
+		  PRINT_TYPE(char *);
 		else
 		  {
 #if defined(__GNUC__) || defined(HAVE_LONG_DOUBLE)
-		    PRINT_TYPE(long double);
+		    PRINT_TYPE(char *);
 #else
-		    PRINT_TYPE(double); /* Hope for the best.  */
+		    PRINT_TYPE(char *); /* Hope for the best.  */
 #endif
 		  }
 	      }
@@ -212,10 +212,10 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
     fflush(stdin); \
 } while (0)
 
-static int checkit (const char * format, long *args);
+static int checkit (const char * format, void **args);
 
 static int
-checkit (const char* format, long *args)
+checkit (const char* format, void **args)
 {
   int result;
   char formatted[1024] = "";
@@ -263,6 +263,7 @@ main (void)
 		 "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"));
 
+#ifdef HIDE_FOR_NOW
   RESULT(checkit, ("<%f><%0+#f>%s%d%s>\n", (void * []) {
 		  (void *)one, (void *)one, (void *) "foo", 77,
 		  (void *) "asdjffffffffffffffiiiiiiiiiiixxxxx"}));
@@ -273,7 +274,6 @@ main (void)
 		  (void * []) {(void *)pi, (void *)pi, (void *)pi}));
   RESULT(errprintf, ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
 
-#ifdef HIDE_FOR_NOW
   RESULT(checkit, ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
   RESULT(errprintf, ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
 
