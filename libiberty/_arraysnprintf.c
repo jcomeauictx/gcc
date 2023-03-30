@@ -35,7 +35,7 @@ int errprintf(const char *format, ...);
 
 #define COPY_INT \
   do { \
-	 const int value = (int *)(args++); \
+	 const int value = (int)(*args++); \
 	 char buf[32]; \
 	 errprintf("COPY_INT called\n"); \
 	 ptr++; /* Go past the asterisk.  */ \
@@ -52,8 +52,9 @@ int errprintf(const char *format, ...);
 
 #define PRINT_TYPE(TYPE) \
   do { \
-	int result; \
-	TYPE value = (TYPE) (*args++); \
+	int result; TYPE value; \
+	if (strcmp("double", #TYPE) == 0) value = (TYPE) (*(*args++)); \
+	else value = (TYPE) (*args++); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = snprintf(formatted + total_printed, \
@@ -167,13 +168,13 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 	    case 'G':
 	      {
 		if (wide_width == 0)
-		  PRINT_TYPE(double *);
+		  PRINT_TYPE(double);
 		else
 		  {
 #if defined(__GNUC__) || defined(HAVE_LONG_DOUBLE)
-		    PRINT_TYPE(long double *);
+		    PRINT_TYPE(long double);
 #else
-		    PRINT_TYPE(double *); /* Hope for the best.  */
+		    PRINT_TYPE(double); /* Hope for the best.  */
 #endif
 		  }
 	      }
