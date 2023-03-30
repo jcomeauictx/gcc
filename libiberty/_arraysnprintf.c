@@ -206,8 +206,9 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 
 #define RESULT(x, ...) do \
 { \
-    int i = x __VA_ARGS__; \
-    x ("printed %d characters\n", x == checkit ? (long[]){i} : i); \
+    int i = x __VA_ARGS__; char * format = "printed %d characters\n"; \
+    if (strcmp("checkit", #x) == 0) x (format, (long[]){i}); \
+    else x (format, i); \
     fflush(stdin); \
 } while (0)
 
@@ -242,34 +243,34 @@ main (void)
   const double ONE = 1.0;
   const double *one = &ONE;
 
-  RESULT(checkit, ("<%d>\n", (long []) {0x12345678}));
+  RESULT(checkit, ("<%d>\n", (void * []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
 
-  RESULT(checkit, ("<%200d>\n", (long []) {5}));
+  RESULT(checkit, ("<%200d>\n", (void * []) {5}));
   RESULT(errprintf, ("<%200d>\n", 5));
 
-  RESULT(checkit, ("<%.300d>\n", (long []) {6}));
+  RESULT(checkit, ("<%.300d>\n", (void * []) {6}));
   RESULT(errprintf, ("<%.300d>\n", 6));
 
-  RESULT(checkit, ("<%100.150d>\n", (long []) {7}));
+  RESULT(checkit, ("<%100.150d>\n", (void * []) {7}));
   RESULT(errprintf, ("<%100.150d>\n", 7));
 
-  RESULT(checkit, ("<%s>\n", (long [])
-		  {(long)
+  RESULT(checkit, ("<%s>\n", (void * [])
+		  {(void *)
 		  "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"}));
   RESULT(errprintf, ("<%s>\n",
 		 "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"));
 
-  RESULT(checkit, ("<%f><%0+#f>%s%d%s>\n", (long []) {
-		  (long)one, (long)one, (long) "foo", 77,
-		  (long) "asdjffffffffffffffiiiiiiiiiiixxxxx"}));
+  RESULT(checkit, ("<%f><%0+#f>%s%d%s>\n", (void * []) {
+		  (void *)one, (void *)one, (void *) "foo", 77,
+		  (void *) "asdjffffffffffffffiiiiiiiiiiixxxxx"}));
   RESULT(errprintf, ("<%f><%0+#f>%s%d%s>\n",
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
 
   RESULT(checkit, ("<%4f><%.4f><%%><%4.4f>\n",
-		  (long []) {(long)pi, (long)pi, (long)pi}));
+		  (void * []) {(void *)pi, (void *)pi, (void *)pi}));
   RESULT(errprintf, ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
 
 #ifdef HIDE_FOR_NOW
