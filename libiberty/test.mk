@@ -7,7 +7,7 @@ all: _doprnt.o _arraysnprintf.o _doprnt.test _arraysnprintf _arraysnprintf.test
 libiberty.a:
 	$(MAKE) libiberty.a
 %.test: %
-	diff <(./$< 2>&1 >/dev/null) <(./$< 2>/dev/null)
+	diff <(./$< 2>/dev/null) <(./$< 2>&1 >/dev/null)
 %.cpp: %.c
 	# show preprocessor output
 	gcc -E -I. -I../include $< | less
