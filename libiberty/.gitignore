@@ -8,3 +8,6 @@ stamp-noasandir
 stamp-picdir
 /required-list
 /xhost-mkfrag
+*.dsm
+*.xxd
+simpletest
