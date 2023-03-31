@@ -51,7 +51,7 @@ char * memdump(char *buffer, void *location, int count);
   do { \
 	int result; TYPE value; \
         char buffer[1024]; \
-        if (strcmp("double", #TYPE) == 0) value = *(TYPE *)*args++; \
+        if (strstr(#TYPE, "double") != NULL) value = *(TYPE *)*args++; \
         else value = *(TYPE *)args++; \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
@@ -170,9 +170,9 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 		else
 		  {
 #if defined(__GNUC__) || defined(HAVE_LONG_DOUBLE)
-		    PRINT_TYPE(char *); /* FIXME: change back to long double */
+		    PRINT_TYPE(long double);
 #else
-		    PRINT_TYPE(char *); /* Hope for the best.  */ /*FIXME*/
+		    PRINT_TYPE(double); /* Hope for the best.  */
 #endif
 		  }
 	      }
@@ -257,7 +257,7 @@ main (void)
   const unsigned char *one = (unsigned char *)&ONE;
   const double SEQ_SHORT = 1.23456;
   const unsigned char *seq_short = (unsigned char *)&SEQ_SHORT;
-  const double SEQ_LONG = 1.234567890123456789L;
+  const long double SEQ_LONG = 1.234567890123456789L;
   const unsigned char *seq_long = (unsigned char *)&SEQ_LONG;
 
   RESULT(checkit, ("<%d>\n", (void * []) {0x12345678}));
