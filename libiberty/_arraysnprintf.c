@@ -30,13 +30,14 @@ int errprintf(const char *format, ...);
 
 #define COPY_INT \
   do { \
-	 const int value = (int)(args++); \
+	 const int value = (int)(*args++); \
 	 char buf[32]; \
-	 errprintf("COPY_INT called\n"); \
+	 errprintf("COPY_INT called with value %d\n", value); \
 	 ptr++; /* Go past the asterisk.  */ \
 	 *sptr = '\0'; /* NULL terminate sptr.  */ \
 	 sprintf(buf, "%d", value); \
 	 strcat(sptr, buf); \
+         errprintf("COPY_INT result: %s\n", sptr); \
 	 while (*sptr) sptr++; \
      } while (0)
 
