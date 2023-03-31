@@ -51,11 +51,7 @@ char * memdump(char *buffer, void *location, int count);
   do { \
 	int result; TYPE value; \
         char buffer[1024]; \
-        if (strcmp("double", #TYPE) == 0) { \
-            value = *(TYPE *)*args++; \
-            printf("%s\n", \
-            memdump(buffer, &value, 8)); \
-        } \
+        if (strcmp("double", #TYPE) == 0) value = *(TYPE *)*args++; \
         else value = *(TYPE *)args++; \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
@@ -259,10 +255,6 @@ main (void)
   const unsigned char *pi = (unsigned char *)&PI;
   const double ONE = 1.0;
   const unsigned char *one = (unsigned char *)&ONE;
-  char buffer[1024];
-
-  memdump(buffer, &PI, 32);
-  printf("%s\n", buffer);
 
   RESULT(checkit, ("<%d>\n", (void * []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
