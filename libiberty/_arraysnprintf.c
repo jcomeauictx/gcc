@@ -52,7 +52,8 @@ int errprintf(const char *format, ...);
         if (strcmp("double", #TYPE) == 0) { \
           temp = *args++; \
           errprintf("temp: %p, value: %s\n", temp, (char *)temp); \
-          value = (TYPE)NULL; /* *(TYPE *)temp; */ \
+          /* value = *(TYPE *)temp; */ \
+          value = (TYPE)"double"; \
         } \
         else value = (TYPE) *args++; \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
@@ -234,25 +235,6 @@ int errprintf(const char *format, ...)
   return result;
 }
 
-char * doublestring(double number) {
-  /* I'm not even sure such a thing is necessary, but so far have been stymied
-   * in inserting and retrieving doubles to/from compound literals. */
-  char *string = malloc(65);  /* at most 4 per digit (\000) plus final null */
-  /* we won't worry about `free`ing the memory, that will happen automatically
-   * at program termination */
-  int offset = 0;
-  int i;
-  unsigned char u, *ptr = (unsigned char *)&number;
-  /* let's do this for little-endian, work on endian-agnostic version later */
-  for (i = 0; i < 8; i++) {
-    u = ptr[i];
-    if (u < ' ' || u > '_') offset += sprintf(string + offset, "\\%03o", u);
-    else string[offset++] = u;
-    string[offset] = '\0';
-  }
-  return string;
-}
-
 int
 main (void)
 {
@@ -260,9 +242,7 @@ main (void)
   const double PI = M_PI;
   const double *pi = &PI;
   const double ONE = 1.0;
-  const double *one = &ONE;
-
-  /*printf("M_PI: %s\n", doublestring(M_PI));  /* test doublestring */
+  const unsigned char *one = (unsigned char *)&ONE;
 
   RESULT(checkit, ("<%d>\n", (void * []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
@@ -285,7 +265,7 @@ main (void)
 777777777777777777333333333333366666666666622222222222777777777777733333"));
 
   RESULT(checkit, ("<%f><%0+#f>%s%d%s>\n", (void * []) {
-		  doublestring(1.0), doublestring(1.0), (void *) "foo", 77,
+		  one, one, (void *) "foo", 77,
 		  (void *) "asdjffffffffffffffiiiiiiiiiiixxxxx"}));
   RESULT(errprintf, ("<%f><%0+#f>%s%d%s>\n",
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
