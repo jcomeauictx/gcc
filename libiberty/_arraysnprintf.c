@@ -27,6 +27,7 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 #include <stdlib.h>
 
 int errprintf(const char *format, ...);
+char * memdump(char *buffer, void *location, int count);
 
 #define COPY_INT \
   do { \
@@ -49,8 +50,10 @@ int errprintf(const char *format, ...);
 #define PRINT_TYPE(TYPE) \
   do { \
 	int result; TYPE value; \
+        char buffer[1024]; \
         value = *(TYPE *)args++; \
-        if (strcmp("double", #TYPE) == 0) errprintf("PRINT_TYPE: value=\"%s\"\n", &value); \
+        if (strcmp("double", #TYPE) == 0) printf("%s\n", \
+            memdump(buffer, &value, 8)); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = snprintf(formatted + total_printed, \
