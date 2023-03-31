@@ -232,6 +232,23 @@ int errprintf(const char *format, ...)
   return result;
 }
 
+char * doublestring(double number) {
+  /* I'm not even sure such a thing is necessary, but so far have been stymied
+   * in inserting and retrieving doubles to/from compound literals. */
+  char *string[65];  /* at most 4 per digit (\000) plus trailing null */
+  int offset = 0;
+  int i;
+  unsigned char u, *ptr = (unsigned char *)&number;
+  /* let's do this for little-endian, work on endian-agnostic version later */
+  for (i = 0; i < 8; i++) {
+    u = ptr[i];
+    if (u < ' ' || u > '_') offset += sprintf(string + offset, "\\%03o", u);
+    else string[offset++] = u;
+    string[offset] = '\0';
+  }
+  return string;
+}
+
 int
 main (void)
 {
@@ -240,6 +257,8 @@ main (void)
   const double *pi = &PI;
   const double ONE = 1.0;
   const double *one = &ONE;
+
+  printf("M_PI: %s\n", doublestring(M_PI));
 
   RESULT(checkit, ("<%d>\n", (void * []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
@@ -307,3 +326,5 @@ main (void)
   return 0;
 }
 #endif /* TEST */
+/* vim: tabstop=8 shiftwidth=2 expandtab softtabstop=2
+ */
