@@ -252,13 +252,13 @@ main (void)
 {
   /* constants needed for some tests below */
   const double PI = M_PI;
-  const unsigned char *pi = (unsigned char *)&PI;
+  unsigned char *pi = (unsigned char *)&PI;
   const double ONE = 1.0;
-  const unsigned char *one = (unsigned char *)&ONE;
+  unsigned char *one = (unsigned char *)&ONE;
   const double SEQ_SHORT = 1.23456;
-  const unsigned char *seq_short = (unsigned char *)&SEQ_SHORT;
+  unsigned char *seq_short = (unsigned char *)&SEQ_SHORT;
   const long double SEQ_LONG = 1.234567890123456789L;
-  const unsigned char *seq_long = (unsigned char *)&SEQ_LONG;
+  unsigned char *seq_long = (unsigned char *)&SEQ_LONG;
 
   RESULT(checkit, ("<%d>\n", (void * []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
