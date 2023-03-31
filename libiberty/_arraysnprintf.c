@@ -204,8 +204,8 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 
 #define RESULT(x, ...) do \
 { \
-    int i = x __VA_ARGS__; char * format = "printed %d characters\n"; \
-    if (strcmp("checkit", #x) == 0) x (format, (long[]){i}); \
+    int i = x __VA_ARGS__; const char * format = "printed %d characters\n"; \
+    if (strcmp("checkit", #x) == 0) x (format, (void * []){(void *)(long)i}); \
     else x (format, i); \
     fflush(stdin); \
 } while (0)
