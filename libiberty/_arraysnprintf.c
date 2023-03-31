@@ -255,6 +255,10 @@ main (void)
   const unsigned char *pi = (unsigned char *)&PI;
   const double ONE = 1.0;
   const unsigned char *one = (unsigned char *)&ONE;
+  const double SEQ_SHORT = 1.23456;
+  const unsigned char *seq_short = (unsigned char *)&SEQ_SHORT;
+  const double SEQ_LONG = 1.234567890123456789L;
+  const unsigned char *seq_long = (unsigned char *)&SEQ_LONG;
 
   RESULT(checkit, ("<%d>\n", (void * []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
@@ -304,20 +308,22 @@ main (void)
                   (void * []) {123, (long)234, 345, 123456789, 456}));
   RESULT(errprintf, ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
 
-#ifdef HIDE_FOR_NOW
 #if defined(__GNUC__) || defined (HAVE_LONG_LONG)
-  RESULT(checkit, ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
+  RESULT(checkit, ("Testing (lld) long long: <%d><%lld><%d>\n", (void * [])
+        {123, 234234234234234234LL, 345}));
   RESULT(errprintf, ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
-  RESULT(checkit, ("Testing (Ld) long long: <%d><%Ld><%d>\n", 123, 234234234234234234LL, 345));
+  RESULT(checkit, ("Testing (Ld) long long: <%d><%Ld><%d>\n", (void * [])
+        {123, 234234234234234234LL, 345}));
   RESULT(errprintf, ("Testing (Ld) long long: <%d><%Ld><%d>\n", 123, 234234234234234234LL, 345));
 #endif
 
 #if defined(__GNUC__) || defined (HAVE_LONG_DOUBLE)
   RESULT(checkit, ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
-		  1.23456, 1.234567890123456789L, 1.23456));
+		 (void * []) {seq_short, seq_long, seq_short}));
   RESULT(errprintf, ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		 1.23456, 1.234567890123456789L, 1.23456));
 #endif
+#ifdef HIDE_FOR_NOW
 #endif  /* HIDE_FOR_NOW */
 
   return 0;
