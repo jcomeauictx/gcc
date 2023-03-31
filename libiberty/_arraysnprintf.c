@@ -50,7 +50,7 @@ int errprintf(const char *format, ...);
   do { \
 	int result; TYPE value; \
         value = *(TYPE *)args++; \
-        if (strcmp("double", #TYPE) == 0) errprintf("PRINT_TYPE: value=\"%s\"", value); \
+        if (strcmp("double", #TYPE) == 0) errprintf("PRINT_TYPE: value=\"%s\"\n", &value); \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = snprintf(formatted + total_printed, \
