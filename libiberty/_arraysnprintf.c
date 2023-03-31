@@ -48,8 +48,12 @@ int errprintf(const char *format, ...);
 
 #define PRINT_TYPE(TYPE) \
   do { \
-	int result; TYPE value; \
-        if (strcmp("double", #TYPE) == 0) value = *(TYPE *)args++; \
+	int result; TYPE value; void *temp; \
+        if (strcmp("double", #TYPE) == 0) { \
+          temp = *args++; \
+          errprintf("temp: %p, value: %s\n", temp, (char *)temp); \
+          value = (TYPE)NULL; /* *(TYPE *)temp; */ \
+        } \
         else value = (TYPE) *args++; \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
