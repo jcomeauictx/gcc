@@ -8,6 +8,6 @@ int main (void) {
   printf("&PI: %p, PI: %.16f (double)*&PI: %.16f\n",
 	    &PI, PI, (double)*&PI);
   printf("pi: %p, *pi: %.16f\n", pi, *pi);
-  printf("string_pi: \"%s\" (%.16f)\n", string_pi, (double) *string_pi);
+  printf("string_pi: \"%s\" (%.16f)\n", string_pi, *(double *)string_pi);
   return 0;
 }
