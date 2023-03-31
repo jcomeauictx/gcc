@@ -18,18 +18,13 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#include "config.h"
 #include "ansidecl.h"
 #include "safe-ctype.h"
 
 #include <stdio.h>
 #include <stdarg.h>
-#ifdef HAVE_STRING_H
 #include <string.h>
-#endif
-#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
-#endif
 
 int errprintf(const char *format, ...);
 
@@ -235,7 +230,9 @@ int errprintf(const char *format, ...)
 char * doublestring(double number) {
   /* I'm not even sure such a thing is necessary, but so far have been stymied
    * in inserting and retrieving doubles to/from compound literals. */
-  char *string[65];  /* at most 4 per digit (\000) plus trailing null */
+  char *string = malloc(65);  /* at most 4 per digit (\000) plus final null */
+  /* we won't worry about `free`ing the memory, that will happen automatically
+   * at program termination */
   int offset = 0;
   int i;
   unsigned char u, *ptr = (unsigned char *)&number;
