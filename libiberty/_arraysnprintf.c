@@ -233,16 +233,19 @@ int errprintf(const char *format, ...)
 char * memdump(char *buffer, void *location, int count) {
   unsigned char uchar, *ptr = &location, *saved = buffer;
   int i;
+  buffer--; /* so we can increment at start of each hex digit */
   for (i = 0; i < sizeof(location); i++) {
+    printf("buffer: %p, uchar: %02x\n", buffer, *ptr);
     uchar = *ptr++;
-    *buffer = uchar >> 4; *buffer += *buffer++ > 9 ? 'a' - 10 : '0';
-    *buffer = uchar & 0xf; *buffer += *buffer++ > 9 ? 'a' - 10: '0';
+    *++buffer = uchar >> 4; *buffer += *buffer > 9 ? 'a' - 10 : '0';
+    *++buffer = uchar & 0xf; *buffer += *buffer > 9 ? 'a' - 10: '0';
   }
   ptr = location;
   for (i = 0; i < count; i++) {
+    printf("buffer: %p, uchar: %02x\n", buffer, *ptr);
     uchar = *ptr++;
-    *buffer = uchar >> 4; *buffer += *buffer++ > 9 ? 'a' - 10 : '0';
-    *buffer = uchar & 0xf; *buffer += *buffer++ > 9 ? 'a' - 10: '0';
+    *++buffer = uchar >> 4; *buffer += *buffer > 9 ? 'a' - 10 : '0';
+    *++buffer = uchar & 0xf; *buffer += *buffer > 9 ? 'a' - 10: '0';
   }
   *buffer = '\0';
   return saved;
@@ -256,9 +259,10 @@ main (void)
   const unsigned char *pi = (unsigned char *)&PI;
   const double ONE = 1.0;
   const unsigned char *one = (unsigned char *)&ONE;
-  char buffer[1024];
+  char buffer[1024] = "so far so bad...";
 
-  errprintf("%s\n", memdump(buffer, &PI, 32));
+  memdump(buffer + strlen(buffer), &PI, 32);
+  printf("%s\n", buffer);
 
   RESULT(checkit, ("<%d>\n", (void * []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
