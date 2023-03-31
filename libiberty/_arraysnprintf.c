@@ -32,12 +32,12 @@ int errprintf(const char *format, ...);
   do { \
 	 const int value = (int)(*args++); \
 	 char buf[32]; \
-	 errprintf("COPY_INT called with value %d\n", value); \
+	 /*errprintf("COPY_INT called with value %d\n", value);*/ \
 	 ptr++; /* Go past the asterisk.  */ \
 	 *sptr = '\0'; /* NULL terminate sptr.  */ \
 	 sprintf(buf, "%d", value); \
 	 strcat(sptr, buf); \
-         errprintf("COPY_INT result: %s\n", sptr); \
+         /*errprintf("COPY_INT result: %s\n", sptr);*/ \
 	 while (*sptr) sptr++; \
      } while (0)
 
@@ -256,7 +256,7 @@ main (void)
   const double ONE = 1.0;
   const double *one = &ONE;
 
-  printf("M_PI: %s\n", doublestring(M_PI));
+  /*printf("M_PI: %s\n", doublestring(M_PI));  /* test doublestring */
 
   RESULT(checkit, ("<%d>\n", (void * []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
