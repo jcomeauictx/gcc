@@ -231,18 +231,17 @@ int errprintf(const char *format, ...)
 }
 
 char * memdump(char *buffer, void *location, int count) {
-  unsigned char uchar, *ptr = &location, *saved = buffer;
+  unsigned char uchar, *ptr = &location + sizeof(location), *saved = buffer;
   int i;
   buffer--; /* so we can increment at start of each hex digit */
   for (i = 0; i < sizeof(location); i++) {
-    printf("buffer: %p, uchar: %02x\n", buffer, *ptr);
-    uchar = *ptr++;
+    uchar = *--ptr;
     *++buffer = uchar >> 4; *buffer += *buffer > 9 ? 'a' - 10 : '0';
     *++buffer = uchar & 0xf; *buffer += *buffer > 9 ? 'a' - 10: '0';
   }
+  *++buffer = ':'; *++buffer = ' ';
   ptr = location;
   for (i = 0; i < count; i++) {
-    printf("buffer: %p, uchar: %02x\n", buffer, *ptr);
     uchar = *ptr++;
     *++buffer = uchar >> 4; *buffer += *buffer > 9 ? 'a' - 10 : '0';
     *++buffer = uchar & 0xf; *buffer += *buffer > 9 ? 'a' - 10: '0';
