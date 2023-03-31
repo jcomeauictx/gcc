@@ -51,9 +51,12 @@ char * memdump(char *buffer, void *location, int count);
   do { \
 	int result; TYPE value; \
         char buffer[1024]; \
-        value = *(TYPE *)args++; \
-        if (strcmp("double", #TYPE) == 0) printf("%s\n", \
+        if (strcmp("double", #TYPE) == 0) { \
+            value = *(TYPE *)*args++; \
+            printf("%s\n", \
             memdump(buffer, &value, 8)); \
+        } \
+        else value = *(TYPE *)args++; \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
 	*sptr = '\0'; /* NULL terminate sptr.  */ \
 	result = snprintf(formatted + total_printed, \
