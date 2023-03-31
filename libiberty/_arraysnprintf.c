@@ -234,7 +234,7 @@ main (void)
 {
   /* constants needed for some tests below */
   const double PI = M_PI;
-  const double *pi = &PI;
+  const unsigned char *pi = (unsigned char *)&PI;
   const double ONE = 1.0;
   const unsigned char *one = (unsigned char *)&ONE;
 
@@ -264,13 +264,12 @@ main (void)
   RESULT(errprintf, ("<%f><%0+#f>%s%d%s>\n",
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
 
-#ifdef HIDE_FOR_NOW
   RESULT(checkit, ("<%4f><%.4f><%%><%4.4f>\n",
-		  (void * []) {(void *)pi, (void *)pi, (void *)pi}));
+		  (void * []) {pi, pi, pi}));
   RESULT(errprintf, ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
 
   RESULT(checkit, ("<%*f><%.*f><%%><%*.*f>\n",
-		  (void * []) {3, (void *)pi, 3, (void *)pi, 3, 3, (void *)pi}));
+		  (void * []) {3, pi, 3, pi, 3, 3, pi}));
   RESULT(errprintf, ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
 
   RESULT(checkit, ("<%d><%i><%o><%u><%x><%X><%c>\n",
@@ -283,9 +282,11 @@ main (void)
   RESULT(errprintf, ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		 75, 75, 75, 75, 75, 75, 75));
 
-  RESULT(checkit, ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
+  RESULT(checkit, ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n",
+                  (void * []) {123, (long)234, 345, 123456789, 456}));
   RESULT(errprintf, ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
 
+#ifdef HIDE_FOR_NOW
 #if defined(__GNUC__) || defined (HAVE_LONG_LONG)
   RESULT(checkit, ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
   RESULT(errprintf, ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
