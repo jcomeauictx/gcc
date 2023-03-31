@@ -230,6 +230,24 @@ int errprintf(const char *format, ...)
   return result;
 }
 
+char * memdump(char *buffer, void *location, int count) {
+  unsigned char uchar, *ptr = &location, *saved = buffer;
+  int i;
+  for (i = 0; i < sizeof(location); i++) {
+    uchar = *ptr++;
+    *buffer = uchar >> 4; *buffer += *buffer++ > 9 ? 'a' - 10 : '0';
+    *buffer = uchar & 0xf; *buffer += *buffer++ > 9 ? 'a' - 10: '0';
+  }
+  ptr = location;
+  for (i = 0; i < count; i++) {
+    uchar = *ptr++;
+    *buffer = uchar >> 4; *buffer += *buffer++ > 9 ? 'a' - 10 : '0';
+    *buffer = uchar & 0xf; *buffer += *buffer++ > 9 ? 'a' - 10: '0';
+  }
+  *buffer = '\0';
+  return saved;
+}
+
 int
 main (void)
 {
@@ -238,6 +256,9 @@ main (void)
   const unsigned char *pi = (unsigned char *)&PI;
   const double ONE = 1.0;
   const unsigned char *one = (unsigned char *)&ONE;
+  char buffer[1024];
+
+  errprintf("%s\n", memdump(buffer, &PI, 32));
 
   RESULT(checkit, ("<%d>\n", (void * []) {0x12345678}));
   RESULT(errprintf, ("<%d>\n", 0x12345678));
