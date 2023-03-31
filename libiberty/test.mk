@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 all: _doprnt.o _arraysnprintf.o _doprnt.test _arraysnprintf _arraysnprintf.test
 %.o: %.c .FORCE
-	$(MAKE) CFLAGS='-DTEST=1' $@
+	$(MAKE) CFLAGS='-DTEST=1 -ftrack-macro-expansion' $@
 %: %.o ./libiberty.a .FORCE
 	gcc $< -o $@ $(word 2, $+)
 libiberty.a:
