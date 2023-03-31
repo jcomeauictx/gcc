@@ -231,15 +231,10 @@ int errprintf(const char *format, ...)
 }
 
 char * memdump(char *buffer, void *location, int count) {
-  unsigned char uchar, *ptr = &location + sizeof(location), *saved = buffer;
+  unsigned char uchar, *ptr, *saved = buffer;
   int i;
+  buffer += sprintf(buffer, "%p: ", location);
   buffer--; /* so we can increment at start of each hex digit */
-  for (i = 0; i < sizeof(location); i++) {
-    uchar = *--ptr;
-    *++buffer = uchar >> 4; *buffer += *buffer > 9 ? 'a' - 10 : '0';
-    *++buffer = uchar & 0xf; *buffer += *buffer > 9 ? 'a' - 10: '0';
-  }
-  *++buffer = ':'; *++buffer = ' ';
   ptr = location;
   for (i = 0; i < count; i++) {
     uchar = *ptr++;
@@ -258,9 +253,9 @@ main (void)
   const unsigned char *pi = (unsigned char *)&PI;
   const double ONE = 1.0;
   const unsigned char *one = (unsigned char *)&ONE;
-  char buffer[1024] = "so far so bad...";
+  char buffer[1024];
 
-  memdump(buffer + strlen(buffer), &PI, 32);
+  memdump(buffer, &PI, 32);
   printf("%s\n", buffer);
 
   RESULT(checkit, ("<%d>\n", (void * []) {0x12345678}));
