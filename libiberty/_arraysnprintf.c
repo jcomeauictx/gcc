@@ -260,16 +260,16 @@ main (void)
   const long double SEQ_LONG = 1.234567890123456789L;
   unsigned char *seq_long = (unsigned char *)&SEQ_LONG;
 
-  RESULT(checkit ("<%d>\n", (void * []) {0x12345678}));
+  RESULT(checkit ("<%d>\n", (void * []) {(void *)0x12345678}));
   RESULT(printf ("<%d>\n", 0x12345678));
 
-  RESULT(checkit ("<%200d>\n", (void * []) {5}));
+  RESULT(checkit ("<%200d>\n", (void * []) {(void *)5}));
   RESULT(printf ("<%200d>\n", 5));
 
-  RESULT(checkit ("<%.300d>\n", (void * []) {6}));
+  RESULT(checkit ("<%.300d>\n", (void * []) {(void *)6}));
   RESULT(printf ("<%.300d>\n", 6));
 
-  RESULT(checkit ("<%100.150d>\n", (void * []) {7}));
+  RESULT(checkit ("<%100.150d>\n", (void * []) {(void *)7}));
   RESULT(printf ("<%100.150d>\n", 7));
 
   RESULT(checkit ("<%s>\n", (void * [])
@@ -281,26 +281,21 @@ main (void)
 777777777777777777333333333333366666666666622222222222777777777777733333"));
 
   RESULT(checkit ("<%f><%0+#f>%s%d%s>\n", (void * []) {
-		  one, one, (void *) "foo", 77,
+		  (void *)one, (void *)one, (void *)"foo", (void *)77,
 		  (void *) "asdjffffffffffffffiiiiiiiiiiixxxxx"}));
   RESULT(printf ("<%f><%0+#f>%s%d%s>\n",
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
 
   RESULT(checkit ("<%4f><%.4f><%%><%4.4f>\n",
-		  (void * []) {pi, pi, pi}));
+		  (void * []) {(void *)pi, (void *)pi, (void *)pi}));
   RESULT(printf ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
 
   RESULT(checkit ("<%*f><%.*f><%%><%*.*f>\n",
-		  (void * []) {3, pi, 3, pi, 3, 3, pi}));
+		  (void * []) {(void *)3, (void *)pi, (void *)3, (void *)pi, (void *)3, (void *)3, (void *)pi}));
   RESULT(printf ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
 
   RESULT(checkit ("<%d><%i><%o><%u><%x><%X><%c>\n",
-		  (void * []) {75, 75, 75, 75, 75, 75, 75}));
-  RESULT(printf ("<%d><%i><%o><%u><%x><%X><%c>\n",
-		 75, 75, 75, 75, 75, 75, 75));
-
-  RESULT(checkit ("<%d><%i><%o><%u><%x><%X><%c>\n",
-		  (void * []) {75, 75, 75, 75, 75, 75, 75}));
+		  (void * []) {(void *)75, (void *)75, (void *)75, (void *)75, (void *)75, (void *)75, (void *)75}));
   RESULT(printf ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		 75, 75, 75, 75, 75, 75, 75));
 

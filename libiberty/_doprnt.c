@@ -270,11 +270,6 @@ main (void)
   RESULT(printf ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		 75, 75, 75, 75, 75, 75, 75));
 
-  RESULT(checkit ("<%d><%i><%o><%u><%x><%X><%c>\n",
-		  75, 75, 75, 75, 75, 75, 75));
-  RESULT(printf ("<%d><%i><%o><%u><%x><%X><%c>\n",
-		 75, 75, 75, 75, 75, 75, 75));
-
   RESULT(checkit ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
   RESULT(printf ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
 
