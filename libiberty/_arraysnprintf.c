@@ -239,7 +239,7 @@ char * memdump(char *buffer, void *location, int count) {
   int i;
   buffer += sprintf(buffer, "%p: ", location);
   buffer--; /* so we can increment at start of each hex digit */
-  ptr = location;
+  ptr = (unsigned char *)location;
   for (i = 0; i < count; i++) {
     uchar = *ptr++;
     *++buffer = uchar >> 4; *buffer += *buffer > 9 ? 'a' - 10 : '0';
@@ -302,21 +302,21 @@ main (void)
 		 75, 75, 75, 75, 75, 75, 75));
 
   RESULT(checkit ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n",
-                  (void * []) {123, (long)234, 345, 123456789, 456}));
+                  (void * []) {(void *)123, (void *)(long)234, (void *)345, (void *)123456789, (void *)456}));
   RESULT(printf ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
 
 #if defined(__GNUC__) || defined (HAVE_LONG_LONG)
   RESULT(checkit ("Testing (lld) long long: <%d><%lld><%d>\n", (void * [])
-        {123, 234234234234234234LL, 345}));
+        {(void *)123, (void *)234234234234234234LL, (void *)345}));
   RESULT(printf ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
   RESULT(checkit ("Testing (Ld) long long: <%d><%Ld><%d>\n", (void * [])
-        {123, 234234234234234234LL, 345}));
+        {(void *)123, (void *)234234234234234234LL, (void *)345}));
   RESULT(printf ("Testing (Ld) long long: <%d><%Ld><%d>\n", 123, 234234234234234234LL, 345));
 #endif  /* HAVE_LONG_LONG */
 
 #if defined(__GNUC__) || defined (HAVE_LONG_DOUBLE)
   RESULT(checkit ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
-		 (void * []) {seq_short, seq_long, seq_short}));
+		 (void * []) {(void *)seq_short, (void *)seq_long, (void *)seq_short}));
   RESULT(printf ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		 1.23456, 1.234567890123456789L, 1.23456));
 #endif  /* HAVE_LONG_DOUBLE */
