@@ -74,7 +74,7 @@ int checkit(const char * format, void **args);
       } while (0)
 
 int
-_arraysnprintf (char *formatted, size_t maxlength, const char *format,
+_arraysnprintf (char *formatted, int maxlength, const char *format,
 	       	void **args)
   /* NOTE that `maxlength` should always be at least 1 less than the size
    * of the `formatted` buffer */
@@ -230,6 +230,7 @@ int precheckit(int buffersize, const char *format, void **args)
   char safety[BUFFERSIZE];
   result = _arraysnprintf (formatted, buffersize - 1, format, args);
   fprintf(stderr, "%s", formatted);  /* avoid double newline */
+  if (formatted[strlen(formatted) - 1] != '\n') fprintf(stderr, "\n");
   return result;
 }
 
@@ -269,6 +270,7 @@ main (void)
 {
   /* constants needed for some tests below */
   char shortbuffer[SHORTBUFFERSIZE];
+  int result;
   const double PI = M_PI;
   unsigned char *pi = (unsigned char *)&PI;
   const double ONE = 1.0;
@@ -340,7 +342,8 @@ main (void)
   /* now let's test buffer overruns for the various macros used */
   /* first, PRINT_CHAR */
   RESULT(precheckit(SHORTBUFFERSIZE, "abcdefghijklmn", (void *){NULL}));
-  RESULT(printf(snprintf(shortbuffer, SHORTBUFFERSIZE, "abcdefghijklmn")));
+  RESULT(result = snprintf(shortbuffer, SHORTBUFFERSIZE, "abcdefghijklmn") &&
+         printf("\n", shortbuffer) && result);
 
   return 0;
 }
