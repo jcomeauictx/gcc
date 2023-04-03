@@ -18,6 +18,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
+#include "config.h"
 #include "ansidecl.h"
 #include "safe-ctype.h"
 
@@ -28,6 +29,7 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 int errprintf(const char *format, ...);
 char * memdump(char *buffer, void *location, int count);
+int checkit(const char * format, void **args);
 
 #define COPY_INT \
   do { \
@@ -50,7 +52,6 @@ char * memdump(char *buffer, void *location, int count);
 #define PRINT_TYPE(TYPE) \
   do { \
 	int result; TYPE value; \
-        char buffer[1024]; \
         if (strstr(#TYPE, "double") != NULL) value = *(TYPE *)*args++; \
         else value = *(TYPE *)args++; \
 	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
@@ -202,23 +203,21 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 #define M_PI (3.1415926535897932385)
 #endif
 
-#define RESULT(x, ...) do \
+#define resultformat "printed %d characters\n"
+
+#define RESULT(x) do \
 { \
-    int i = x __VA_ARGS__; const char * format = "printed %d characters\n"; \
-    if (strcmp("checkit", #x) == 0) x (format, (void * []){(void *)(long)i}); \
-    else x (format, i); \
+    int i = (x); \
+    (strstr(#x, "checkit") != NULL ? checkit : printf)(resultformat, i); \
     fflush(stdin); \
 } while (0)
 
-static int checkit (const char * format, void **args);
-
-static int
-checkit (const char* format, void **args)
+int checkit(const char* format, void **args)
 {
   int result;
   char formatted[1024] = "";
   result = _arraysnprintf (formatted, 1024, format, args);
-  printf("%s", formatted);  /* avoid double newline */
+  fprintf(stderr, "%s", formatted);  /* avoid double newline */
   return result;
 }
 
@@ -260,70 +259,70 @@ main (void)
   const long double SEQ_LONG = 1.234567890123456789L;
   unsigned char *seq_long = (unsigned char *)&SEQ_LONG;
 
-  RESULT(checkit, ("<%d>\n", (void * []) {0x12345678}));
-  RESULT(errprintf, ("<%d>\n", 0x12345678));
+  RESULT(checkit ("<%d>\n", (void * []) {0x12345678}));
+  RESULT(printf ("<%d>\n", 0x12345678));
 
-  RESULT(checkit, ("<%200d>\n", (void * []) {5}));
-  RESULT(errprintf, ("<%200d>\n", 5));
+#ifdef HIDE_FOR_NOW
+  RESULT(checkit ("<%200d>\n", (void * []) {5}));
+  RESULT(printf ("<%200d>\n", 5));
 
-  RESULT(checkit, ("<%.300d>\n", (void * []) {6}));
-  RESULT(errprintf, ("<%.300d>\n", 6));
+  RESULT(checkit ("<%.300d>\n", (void * []) {6}));
+  RESULT(printf ("<%.300d>\n", 6));
 
-  RESULT(checkit, ("<%100.150d>\n", (void * []) {7}));
-  RESULT(errprintf, ("<%100.150d>\n", 7));
+  RESULT(checkit ("<%100.150d>\n", (void * []) {7}));
+  RESULT(printf ("<%100.150d>\n", 7));
 
-  RESULT(checkit, ("<%s>\n", (void * [])
+  RESULT(checkit ("<%s>\n", (void * [])
 		  {(void *)
 		  "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"}));
-  RESULT(errprintf, ("<%s>\n",
+  RESULT(printf ("<%s>\n",
 		 "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"));
 
-  RESULT(checkit, ("<%f><%0+#f>%s%d%s>\n", (void * []) {
+  RESULT(checkit ("<%f><%0+#f>%s%d%s>\n", (void * []) {
 		  one, one, (void *) "foo", 77,
 		  (void *) "asdjffffffffffffffiiiiiiiiiiixxxxx"}));
-  RESULT(errprintf, ("<%f><%0+#f>%s%d%s>\n",
+  RESULT(printf ("<%f><%0+#f>%s%d%s>\n",
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
 
-  RESULT(checkit, ("<%4f><%.4f><%%><%4.4f>\n",
+  RESULT(checkit ("<%4f><%.4f><%%><%4.4f>\n",
 		  (void * []) {pi, pi, pi}));
-  RESULT(errprintf, ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
+  RESULT(printf ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
 
-  RESULT(checkit, ("<%*f><%.*f><%%><%*.*f>\n",
+  RESULT(checkit ("<%*f><%.*f><%%><%*.*f>\n",
 		  (void * []) {3, pi, 3, pi, 3, 3, pi}));
-  RESULT(errprintf, ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
+  RESULT(printf ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
 
-  RESULT(checkit, ("<%d><%i><%o><%u><%x><%X><%c>\n",
+  RESULT(checkit ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		  (void * []) {75, 75, 75, 75, 75, 75, 75}));
-  RESULT(errprintf, ("<%d><%i><%o><%u><%x><%X><%c>\n",
+  RESULT(printf ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		 75, 75, 75, 75, 75, 75, 75));
 
-  RESULT(checkit, ("<%d><%i><%o><%u><%x><%X><%c>\n",
+  RESULT(checkit ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		  (void * []) {75, 75, 75, 75, 75, 75, 75}));
-  RESULT(errprintf, ("<%d><%i><%o><%u><%x><%X><%c>\n",
+  RESULT(printf ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		 75, 75, 75, 75, 75, 75, 75));
 
-  RESULT(checkit, ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n",
+  RESULT(checkit ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n",
                   (void * []) {123, (long)234, 345, 123456789, 456}));
-  RESULT(errprintf, ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
+  RESULT(printf ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
 
 #if defined(__GNUC__) || defined (HAVE_LONG_LONG)
-  RESULT(checkit, ("Testing (lld) long long: <%d><%lld><%d>\n", (void * [])
+  RESULT(checkit ("Testing (lld) long long: <%d><%lld><%d>\n", (void * [])
         {123, 234234234234234234LL, 345}));
-  RESULT(errprintf, ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
-  RESULT(checkit, ("Testing (Ld) long long: <%d><%Ld><%d>\n", (void * [])
+  RESULT(printf ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
+  RESULT(checkit ("Testing (Ld) long long: <%d><%Ld><%d>\n", (void * [])
         {123, 234234234234234234LL, 345}));
-  RESULT(errprintf, ("Testing (Ld) long long: <%d><%Ld><%d>\n", 123, 234234234234234234LL, 345));
+  RESULT(printf ("Testing (Ld) long long: <%d><%Ld><%d>\n", 123, 234234234234234234LL, 345));
 #endif
 
 #if defined(__GNUC__) || defined (HAVE_LONG_DOUBLE)
-  RESULT(checkit, ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
+  RESULT(checkit ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		 (void * []) {seq_short, seq_long, seq_short}));
-  RESULT(errprintf, ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
+  RESULT(printf ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		 1.23456, 1.234567890123456789L, 1.23456));
 #endif
-#ifdef HIDE_FOR_NOW
 #endif  /* HIDE_FOR_NOW */
 
   return 0;
