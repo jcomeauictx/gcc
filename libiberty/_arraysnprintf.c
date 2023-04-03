@@ -33,7 +33,7 @@ int checkit(const char * format, void **args);
 
 #define COPY_INT \
   do { \
-	 const int value = (int)(*args++); \
+	 const int value = (int)(long)(*args++); \
 	 char buf[32]; \
 	 /*errprintf("COPY_INT called with value %d\n", value);*/ \
 	 ptr++; /* Go past the asterisk.  */ \
@@ -208,7 +208,8 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 #define RESULT(x) do \
 { \
     int i = (x); \
-    if (strstr(#x, "checkit") != NULL) checkit(resultformat, (int * []){i}); \
+    if (strstr(#x, "checkit") != NULL) \
+      checkit(resultformat, (void * []){(void *)(long)i}); \
     else printf(resultformat, i); \
     fflush(stdin); \
 } while (0)
@@ -233,7 +234,8 @@ int errprintf(const char *format, ...)
 }
 
 char * memdump(char *buffer, void *location, int count) {
-  unsigned char uchar, *ptr, *saved = buffer;
+  unsigned char uchar, *ptr;
+  char *saved = buffer;
   int i;
   buffer += sprintf(buffer, "%p: ", location);
   buffer--; /* so we can increment at start of each hex digit */
