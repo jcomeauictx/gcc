@@ -31,6 +31,8 @@ int errprintf(const char *format, ...);
 char * memdump(char *buffer, void *location, int count);
 int checkit(const char * format, void **args);
 
+#define BUFFERSIZE 1024
+
 #define COPY_INT \
   do { \
 	 const int value = (int)(long)(*args++); \
@@ -46,7 +48,8 @@ int checkit(const char * format, void **args);
 
 #define PRINT_CHAR(CHAR) \
   do { \
-	 *(formatted + total_printed++) = *ptr++; \
+	 if (total_printed < maxlength) \
+           *(formatted + total_printed++) = *ptr++; \
      } while (0)
 
 #define PRINT_TYPE(TYPE) \
@@ -70,6 +73,8 @@ int checkit(const char * format, void **args);
 int
 _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 	       	void **args)
+  /* NOTE that `maxlength` should always be at least 1 less than the size
+   * of the `formatted` buffer */
 {
   const char * ptr = format;
   char specifier[128];
@@ -217,8 +222,10 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 int checkit(const char* format, void **args)
 {
   int result;
-  char formatted[1024] = "";
-  result = _arraysnprintf (formatted, 1024, format, args);
+  char formatted[BUFFERSIZE] = "";
+  /* allocate a safety zone in case program error causes buffer overrun */
+  char safety[BUFFERSIZE];
+  result = _arraysnprintf (formatted, BUFFERSIZE - 1, format, args);
   fprintf(stderr, "%s", formatted);  /* avoid double newline */
   return result;
 }
