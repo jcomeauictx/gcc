@@ -29,9 +29,11 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 int errprintf(const char *format, ...);
 char * memdump(char *buffer, void *location, int count);
+int precheckit(int buffersize, const char *format, void **args);
 int checkit(const char * format, void **args);
 
 #define BUFFERSIZE 1024
+#define SHORTBUFFERSIZE 7
 
 #define COPY_INT \
   do { \
@@ -219,15 +221,20 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
     fflush(stdin); \
 } while (0)
 
-int checkit(const char* format, void **args)
+int precheckit(int buffersize, const char *format, void **args)
 {
   int result;
-  char formatted[BUFFERSIZE] = "";
+  char formatted[BUFFERSIZE] = "";  /* can't use runtime-supplied size */
   /* allocate a safety zone in case program error causes buffer overrun */
   char safety[BUFFERSIZE];
-  result = _arraysnprintf (formatted, BUFFERSIZE - 1, format, args);
+  result = _arraysnprintf (formatted, buffersize - 1, format, args);
   fprintf(stderr, "%s", formatted);  /* avoid double newline */
   return result;
+}
+
+int checkit(const char* format, void **args)
+{
+  return precheckit(BUFFERSIZE, format, args);
 }
 
 int errprintf(const char *format, ...)
@@ -260,6 +267,7 @@ int
 main (void)
 {
   /* constants needed for some tests below */
+  char shortbuffer[SHORTBUFFERSIZE];
   const double PI = M_PI;
   unsigned char *pi = (unsigned char *)&PI;
   const double ONE = 1.0;
@@ -330,8 +338,8 @@ main (void)
 
   /* now let's test buffer overruns for the various macros used */
   /* first, PRINT_CHAR */
-  RESULT(_arraysnprintf("test buffer", 7, "abcdefghijklmn", (void *){NULL}));
-  RESULT(printf(snprintf("test buffer", 7, "abcdefghijklmn")));
+  RESULT(precheckit(SHORTBUFFERSIZE, "abcdefghijklmn", (void *){NULL}));
+  RESULT(printf(snprintf(shortbuffer, SHORTBUFFERSIZE, "abcdefghijklmn")));
 
   return 0;
 }
