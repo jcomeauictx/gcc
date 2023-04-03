@@ -208,7 +208,8 @@ _arraysnprintf (char *formatted, size_t maxlength, const char *format,
 #define RESULT(x) do \
 { \
     int i = (x); \
-    (strstr(#x, "checkit") != NULL ? checkit : printf)(resultformat, i); \
+    if (strstr(#x, "checkit") != NULL) checkit(resultformat, (int * []){i}); \
+    else printf(resultformat, i); \
     fflush(stdin); \
 } while (0)
 
@@ -262,7 +263,6 @@ main (void)
   RESULT(checkit ("<%d>\n", (void * []) {0x12345678}));
   RESULT(printf ("<%d>\n", 0x12345678));
 
-#ifdef HIDE_FOR_NOW
   RESULT(checkit ("<%200d>\n", (void * []) {5}));
   RESULT(printf ("<%200d>\n", 5));
 
@@ -315,14 +315,15 @@ main (void)
   RESULT(checkit ("Testing (Ld) long long: <%d><%Ld><%d>\n", (void * [])
         {123, 234234234234234234LL, 345}));
   RESULT(printf ("Testing (Ld) long long: <%d><%Ld><%d>\n", 123, 234234234234234234LL, 345));
-#endif
+#endif  /* HAVE_LONG_LONG */
 
 #if defined(__GNUC__) || defined (HAVE_LONG_DOUBLE)
   RESULT(checkit ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		 (void * []) {seq_short, seq_long, seq_short}));
   RESULT(printf ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		 1.23456, 1.234567890123456789L, 1.23456));
-#endif
+#endif  /* HAVE_LONG_DOUBLE */
+#ifdef HIDE_FOR_NOW
 #endif  /* HIDE_FOR_NOW */
 
   return 0;
