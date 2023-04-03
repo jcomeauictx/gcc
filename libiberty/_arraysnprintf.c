@@ -52,6 +52,7 @@ int checkit(const char * format, void **args);
   do { \
 	 if (total_printed < maxlength) \
            *(formatted + total_printed++) = *ptr++; \
+         else {total_printed++; ptr++;} \
      } while (0)
 
 #define PRINT_TYPE(TYPE) \
