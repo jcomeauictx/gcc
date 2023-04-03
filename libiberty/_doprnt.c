@@ -208,14 +208,14 @@ _doprnt (const char *format, va_list ap, FILE *stream)
 #define M_PI (3.1415926535897932385)
 #endif
 
-#define RESULT(x, ...) do \
+#define resultformat "printed %d characters\n"
+
+#define RESULT(x) do \
 { \
-    int i = x __VA_ARGS__; \
-    x ("printed %d characters\n", i); \
+    int i = (x); \
+    (strstr(#x, "checkit") != NULL ? checkit : printf)(resultformat, i); \
     fflush(stdin); \
 } while (0)
-
-#define errprintf(...) fprintf(stderr, __VA_ARGS__)
 
 static int checkit (const char * format, ...) ATTRIBUTE_PRINTF_1;
 
@@ -226,7 +226,7 @@ checkit (const char* format, ...)
   va_list args;
   va_start (args, format);
 
-  result = _doprnt (format, args, stdout);
+  result = _doprnt (format, args, stderr);
   va_end (args);
 
   return result;
@@ -235,60 +235,60 @@ checkit (const char* format, ...)
 int
 main (void)
 {
-  RESULT(checkit, ("<%d>\n", 0x12345678));
-  RESULT(errprintf, ("<%d>\n", 0x12345678));
+  RESULT(checkit ("<%d>\n", 0x12345678));
+  RESULT(printf ("<%d>\n", 0x12345678));
 
-  RESULT(checkit, ("<%200d>\n", 5));
-  RESULT(errprintf, ("<%200d>\n", 5));
+  RESULT(checkit ("<%200d>\n", 5));
+  RESULT(printf ("<%200d>\n", 5));
 
-  RESULT(checkit, ("<%.300d>\n", 6));
-  RESULT(errprintf, ("<%.300d>\n", 6));
+  RESULT(checkit ("<%.300d>\n", 6));
+  RESULT(printf ("<%.300d>\n", 6));
 
-  RESULT(checkit, ("<%100.150d>\n", 7));
-  RESULT(errprintf, ("<%100.150d>\n", 7));
+  RESULT(checkit ("<%100.150d>\n", 7));
+  RESULT(printf ("<%100.150d>\n", 7));
 
-  RESULT(checkit, ("<%s>\n",
+  RESULT(checkit ("<%s>\n",
 		  "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"));
-  RESULT(errprintf, ("<%s>\n",
+  RESULT(printf ("<%s>\n",
 		 "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"));
 
-  RESULT(checkit, ("<%f><%0+#f>%s%d%s>\n",
+  RESULT(checkit ("<%f><%0+#f>%s%d%s>\n",
 		  1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
-  RESULT(errprintf, ("<%f><%0+#f>%s%d%s>\n",
+  RESULT(printf ("<%f><%0+#f>%s%d%s>\n",
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
 
-  RESULT(checkit, ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
-  RESULT(errprintf, ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
+  RESULT(checkit ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
+  RESULT(printf ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
 
-  RESULT(checkit, ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
-  RESULT(errprintf, ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
+  RESULT(checkit ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
+  RESULT(printf ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
 
-  RESULT(checkit, ("<%d><%i><%o><%u><%x><%X><%c>\n",
+  RESULT(checkit ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		  75, 75, 75, 75, 75, 75, 75));
-  RESULT(errprintf, ("<%d><%i><%o><%u><%x><%X><%c>\n",
+  RESULT(printf ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		 75, 75, 75, 75, 75, 75, 75));
 
-  RESULT(checkit, ("<%d><%i><%o><%u><%x><%X><%c>\n",
+  RESULT(checkit ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		  75, 75, 75, 75, 75, 75, 75));
-  RESULT(errprintf, ("<%d><%i><%o><%u><%x><%X><%c>\n",
+  RESULT(printf ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		 75, 75, 75, 75, 75, 75, 75));
 
-  RESULT(checkit, ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
-  RESULT(errprintf, ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
+  RESULT(checkit ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
+  RESULT(printf ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
 
 #if defined(__GNUC__) || defined (HAVE_LONG_LONG)
-  RESULT(checkit, ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
-  RESULT(errprintf, ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
-  RESULT(checkit, ("Testing (Ld) long long: <%d><%Ld><%d>\n", 123, 234234234234234234LL, 345));
-  RESULT(errprintf, ("Testing (Ld) long long: <%d><%Ld><%d>\n", 123, 234234234234234234LL, 345));
+  RESULT(checkit ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
+  RESULT(printf ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
+  RESULT(checkit ("Testing (Ld) long long: <%d><%Ld><%d>\n", 123, 234234234234234234LL, 345));
+  RESULT(printf ("Testing (Ld) long long: <%d><%Ld><%d>\n", 123, 234234234234234234LL, 345));
 #endif
 
 #if defined(__GNUC__) || defined (HAVE_LONG_DOUBLE)
-  RESULT(checkit, ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
+  RESULT(checkit ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		  1.23456, 1.234567890123456789L, 1.23456));
-  RESULT(errprintf, ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
+  RESULT(printf ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		 1.23456, 1.234567890123456789L, 1.23456));
 #endif
 
