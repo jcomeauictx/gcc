@@ -327,8 +327,11 @@ main (void)
   RESULT(printf ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		 1.23456, 1.234567890123456789L, 1.23456));
 #endif  /* HAVE_LONG_DOUBLE */
-#ifdef HIDE_FOR_NOW
-#endif  /* HIDE_FOR_NOW */
+
+  /* now let's test buffer overruns for the various macros used */
+  /* first, PRINT_CHAR */
+  RESULT(_arraysnprintf("test buffer", 7, "abcdefghijklmn", (void *){NULL}));
+  RESULT(printf(snprintf("test buffer", 7, "abcdefghijklmn")));
 
   return 0;
 }
