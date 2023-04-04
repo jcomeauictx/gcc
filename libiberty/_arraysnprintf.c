@@ -213,12 +213,13 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
 #endif
 
 #define resultformat "printed %d characters\n"
+#define CAST_ARGS (void * [])
 
 #define RESULT(x) do \
 { \
     int i = (x); \
     if (strstr(#x, "checkit") != NULL) \
-      checkit(resultformat, (void * []){(void *)(long)i}); \
+      checkit(resultformat, CAST_ARGS{(void *)(long)i}); \
     else printf(resultformat, i); \
     fflush(stdin); \
 } while (0)
@@ -293,19 +294,19 @@ main (void)
   const long double SEQ_LONG = 1.234567890123456789L;
   unsigned char *seq_long = (unsigned char *)&SEQ_LONG;
 
-  RESULT(checkit ("<%d>\n", (void * []) {(void *)0x12345678}));
+  RESULT(checkit ("<%d>\n", CAST_ARGS {(void *)0x12345678}));
   RESULT(printf ("<%d>\n", 0x12345678));
 
-  RESULT(checkit ("<%200d>\n", (void * []) {(void *)5}));
+  RESULT(checkit ("<%200d>\n", CAST_ARGS {(void *)5}));
   RESULT(printf ("<%200d>\n", 5));
 
-  RESULT(checkit ("<%.300d>\n", (void * []) {(void *)6}));
+  RESULT(checkit ("<%.300d>\n", CAST_ARGS {(void *)6}));
   RESULT(printf ("<%.300d>\n", 6));
 
-  RESULT(checkit ("<%100.150d>\n", (void * []) {(void *)7}));
+  RESULT(checkit ("<%100.150d>\n", CAST_ARGS {(void *)7}));
   RESULT(printf ("<%100.150d>\n", 7));
 
-  RESULT(checkit ("<%s>\n", (void * [])
+  RESULT(checkit ("<%s>\n", CAST_ARGS
 		  {(void *)
 		  "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"}));
@@ -313,41 +314,41 @@ main (void)
 		 "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
 777777777777777777333333333333366666666666622222222222777777777777733333"));
 
-  RESULT(checkit ("<%f><%0+#f>%s%d%s>\n", (void * []) {
+  RESULT(checkit ("<%f><%0+#f>%s%d%s>\n", CAST_ARGS {
 		  (void *)one, (void *)one, (void *)"foo", (void *)77,
 		  (void *) "asdjffffffffffffffiiiiiiiiiiixxxxx"}));
   RESULT(printf ("<%f><%0+#f>%s%d%s>\n",
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
 
   RESULT(checkit ("<%4f><%.4f><%%><%4.4f>\n",
-		  (void * []) {(void *)pi, (void *)pi, (void *)pi}));
+		  CAST_ARGS {(void *)pi, (void *)pi, (void *)pi}));
   RESULT(printf ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
 
   RESULT(checkit ("<%*f><%.*f><%%><%*.*f>\n",
-		  (void * []) {(void *)3, (void *)pi, (void *)3, (void *)pi, (void *)3, (void *)3, (void *)pi}));
+		  CAST_ARGS {(void *)3, (void *)pi, (void *)3, (void *)pi, (void *)3, (void *)3, (void *)pi}));
   RESULT(printf ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
 
   RESULT(checkit ("<%d><%i><%o><%u><%x><%X><%c>\n",
-		  (void * []) {(void *)75, (void *)75, (void *)75, (void *)75, (void *)75, (void *)75, (void *)75}));
+		  CAST_ARGS {(void *)75, (void *)75, (void *)75, (void *)75, (void *)75, (void *)75, (void *)75}));
   RESULT(printf ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		 75, 75, 75, 75, 75, 75, 75));
 
   RESULT(checkit ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n",
-                  (void * []) {(void *)123, (void *)(long)234, (void *)345, (void *)123456789, (void *)456}));
+                  CAST_ARGS {(void *)123, (void *)(long)234, (void *)345, (void *)123456789, (void *)456}));
   RESULT(printf ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
 
 #if defined(__GNUC__) || defined (HAVE_LONG_LONG)
-  RESULT(checkit ("Testing (lld) long long: <%d><%lld><%d>\n", (void * [])
+  RESULT(checkit ("Testing (lld) long long: <%d><%lld><%d>\n", CAST_ARGS 
         {(void *)123, (void *)234234234234234234LL, (void *)345}));
   RESULT(printf ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
-  RESULT(checkit ("Testing (Ld) long long: <%d><%Ld><%d>\n", (void * [])
+  RESULT(checkit ("Testing (Ld) long long: <%d><%Ld><%d>\n", CAST_ARGS
         {(void *)123, (void *)234234234234234234LL, (void *)345}));
   RESULT(printf ("Testing (Ld) long long: <%d><%Ld><%d>\n", 123, 234234234234234234LL, 345));
 #endif  /* HAVE_LONG_LONG */
 
 #if defined(__GNUC__) || defined (HAVE_LONG_DOUBLE)
   RESULT(checkit ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
-		 (void * []) {(void *)seq_short, (void *)seq_long, (void *)seq_short}));
+		 CAST_ARGS {(void *)seq_short, (void *)seq_long, (void *)seq_short}));
   RESULT(printf ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		 1.23456, 1.234567890123456789L, 1.23456));
 #endif  /* HAVE_LONG_DOUBLE */
