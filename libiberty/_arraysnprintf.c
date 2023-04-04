@@ -29,8 +29,8 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 int errprintf(const char *format, ...);
 char * memdump(char *buffer, void *location, int count);
-int precheckit(int buffersize, const char *format, void **args);
-int checkit(const char * format, void **args);
+int precheckit(int buffersize, const char *format, double *args);
+int checkit(const char * format, double *args);
 int testsnprintf(int size, const char *format, ...);
 
 #define BUFFERSIZE 1024
@@ -38,7 +38,7 @@ int testsnprintf(int size, const char *format, ...);
 
 #define COPY_INT \
   do { \
-	 const int value = (int)(long)(*args++); \
+	 const int value = (int)(*args++); \
 	 char buf[32]; \
 	 /*errprintf("COPY_INT called with value %d\n", value);*/ \
 	 ptr++; /* Go past the asterisk.  */ \
@@ -51,32 +51,32 @@ int testsnprintf(int size, const char *format, ...);
 
 #define PRINT_CHAR(CHAR) \
   do { \
-	 if (total_printed < maxlength) \
-           *(formatted + total_printed++) = *ptr++; \
-         else {total_printed++; ptr++;} \
-     } while (0)
+   if (total_printed < maxlength) \
+     *(formatted + total_printed++) = *ptr++; \
+   else {total_printed++; ptr++;} \
+  } while (0)
 
 #define PRINT_TYPE(TYPE) \
   do { \
-	int result; TYPE value; \
-        if (strstr(#TYPE, "double") != NULL) value = *(TYPE *)*args++; \
-        else value = *(TYPE *)args++; \
-	*sptr++ = *ptr++; /* Copy the type specifier.  */ \
-	*sptr = '\0'; /* NULL terminate sptr.  */ \
-	result = snprintf(formatted + total_printed, \
-	  maxlength - total_printed, specifier, value); \
-	if (result == -1) \
-	  return -1; \
-	else \
-	  { \
-	    total_printed += result; \
-	    continue; \
-	  } \
-      } while (0)
+    int result; TYPE value; \
+    if (index(#TYPE, '*') == strlen(#TYPE) - 1) value = *(TYPE *)(long)args++; \
+    else value = *(TYPE *)args++; \
+    *sptr++ = *ptr++; /* Copy the type specifier.  */ \
+    *sptr = '\0'; /* NULL terminate sptr.  */ \
+    result = snprintf(formatted + total_printed, \
+      maxlength - total_printed, specifier, value); \
+    if (result == -1) \
+      return -1; \
+    else \
+      { \
+        total_printed += result; \
+        continue; \
+      } \
+  } while (0)
 
 int
 _arraysnprintf (char *formatted, int maxlength, const char *format,
-	       	void **args)
+	       	double *args)
   /* NOTE that `maxlength` should always be at least 1 less than the size
    * of the `formatted` buffer */
 {
@@ -213,13 +213,14 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
 #endif
 
 #define resultformat "printed %d characters\n"
-#define CAST_ARGS (void * [])
-
+#define CAST_ARGS (double [])
+#define CAST_ARG (double)
+#define FORCE_CAST (double)(long)  /* for converting pointers */
 #define RESULT(x) do \
 { \
     int i = (x); \
     if (strstr(#x, "checkit") != NULL) \
-      checkit(resultformat, CAST_ARGS{(void *)(long)i}); \
+      checkit(resultformat, CAST_ARGS{i}); \
     else printf(resultformat, i); \
     fflush(stdin); \
 } while (0)
@@ -238,7 +239,7 @@ int testsnprintf(int size, const char *format, ...)
   return result;
 }
 
-int precheckit(int buffersize, const char *format, void **args)
+int precheckit(int buffersize, const char *format, double *args)
 {
   int result;
   char formatted[BUFFERSIZE] = "";  /* can't use runtime-supplied size */
@@ -250,7 +251,7 @@ int precheckit(int buffersize, const char *format, void **args)
   return result;
 }
 
-int checkit(const char* format, void **args)
+int checkit(const char* format, double *args)
 {
   return precheckit(BUFFERSIZE, format, args);
 }
@@ -285,77 +286,70 @@ int
 main (void)
 {
   /* constants needed for some tests below */
-  const double PI = M_PI;
-  unsigned char *pi = (unsigned char *)&PI;
-  const double ONE = 1.0;
-  unsigned char *one = (unsigned char *)&ONE;
-  const double SEQ_SHORT = 1.23456;
-  unsigned char *seq_short = (unsigned char *)&SEQ_SHORT;
-  const long double SEQ_LONG = 1.234567890123456789L;
-  unsigned char *seq_long = (unsigned char *)&SEQ_LONG;
 
-  RESULT(checkit ("<%d>\n", CAST_ARGS {(void *)0x12345678}));
+  RESULT(checkit ("<%d>\n", CAST_ARGS {0x12345678}));
   RESULT(printf ("<%d>\n", 0x12345678));
 
-  RESULT(checkit ("<%200d>\n", CAST_ARGS {(void *)5}));
+  RESULT(checkit ("<%200d>\n", CAST_ARGS {5}));
   RESULT(printf ("<%200d>\n", 5));
 
-  RESULT(checkit ("<%.300d>\n", CAST_ARGS {(void *)6}));
+  RESULT(checkit ("<%.300d>\n", CAST_ARGS {6}));
   RESULT(printf ("<%.300d>\n", 6));
 
-  RESULT(checkit ("<%100.150d>\n", CAST_ARGS {(void *)7}));
+  RESULT(checkit ("<%100.150d>\n", CAST_ARGS {7}));
   RESULT(printf ("<%100.150d>\n", 7));
 
-  RESULT(checkit ("<%s>\n", CAST_ARGS
-		  {(void *)
-		  "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
-777777777777777777333333333333366666666666622222222222777777777777733333"}));
+  RESULT(checkit ("<%s>\n", CAST_ARGS {
+    FORCE_CAST "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
+    777777777777777777333333333333366666666666622222222222777777777777733333"
+  }));
   RESULT(printf ("<%s>\n",
-		 "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
-777777777777777777333333333333366666666666622222222222777777777777733333"));
+    "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
+    777777777777777777333333333333366666666666622222222222777777777777733333"
+  ));
 
   RESULT(checkit ("<%f><%0+#f>%s%d%s>\n", CAST_ARGS {
-		  (void *)one, (void *)one, (void *)"foo", (void *)77,
-		  (void *) "asdjffffffffffffffiiiiiiiiiiixxxxx"}));
+		  1.0, 1.0, FORCE_CAST "foo", 77,
+		   FORCE_CAST "asdjffffffffffffffiiiiiiiiiiixxxxx"}));
   RESULT(printf ("<%f><%0+#f>%s%d%s>\n",
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
 
   RESULT(checkit ("<%4f><%.4f><%%><%4.4f>\n",
-		  CAST_ARGS {(void *)pi, (void *)pi, (void *)pi}));
+		  CAST_ARGS {M_PI, M_PI, M_PI}));
   RESULT(printf ("<%4f><%.4f><%%><%4.4f>\n", M_PI, M_PI, M_PI));
 
   RESULT(checkit ("<%*f><%.*f><%%><%*.*f>\n",
-		  CAST_ARGS {(void *)3, (void *)pi, (void *)3, (void *)pi, (void *)3, (void *)3, (void *)pi}));
+		  CAST_ARGS {3, M_PI, 3, M_PI, 3, 3, M_PI}));
   RESULT(printf ("<%*f><%.*f><%%><%*.*f>\n", 3, M_PI, 3, M_PI, 3, 3, M_PI));
 
   RESULT(checkit ("<%d><%i><%o><%u><%x><%X><%c>\n",
-		  CAST_ARGS {(void *)75, (void *)75, (void *)75, (void *)75, (void *)75, (void *)75, (void *)75}));
+		  CAST_ARGS {75, 75, 75, 75, 75, 75, 75}));
   RESULT(printf ("<%d><%i><%o><%u><%x><%X><%c>\n",
 		 75, 75, 75, 75, 75, 75, 75));
 
   RESULT(checkit ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n",
-                  CAST_ARGS {(void *)123, (void *)(long)234, (void *)345, (void *)123456789, (void *)456}));
+                  CAST_ARGS {123, (long)234, 345, 123456789, 456}));
   RESULT(printf ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
 
 #if defined(__GNUC__) || defined (HAVE_LONG_LONG)
   RESULT(checkit ("Testing (lld) long long: <%d><%lld><%d>\n", CAST_ARGS 
-        {(void *)123, (void *)234234234234234234LL, (void *)345}));
+        {123, 234234234234234234LL, 345}));
   RESULT(printf ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
   RESULT(checkit ("Testing (Ld) long long: <%d><%Ld><%d>\n", CAST_ARGS
-        {(void *)123, (void *)234234234234234234LL, (void *)345}));
+        {123, 234234234234234234LL, 345}));
   RESULT(printf ("Testing (Ld) long long: <%d><%Ld><%d>\n", 123, 234234234234234234LL, 345));
 #endif  /* HAVE_LONG_LONG */
 
 #if defined(__GNUC__) || defined (HAVE_LONG_DOUBLE)
   RESULT(checkit ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
-		 CAST_ARGS {(void *)seq_short, (void *)seq_long, (void *)seq_short}));
+		 CAST_ARGS {1.23456, 1.234567890123456789L, 1.23456}));
   RESULT(printf ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		 1.23456, 1.234567890123456789L, 1.23456));
 #endif  /* HAVE_LONG_DOUBLE */
 
   /* now let's test buffer overruns for the various macros used */
   /* first, PRINT_CHAR */
-  RESULT(precheckit(SHORTBUFFERSIZE, "abcdefghijklmn", (void *){NULL}));
+  RESULT(precheckit(SHORTBUFFERSIZE, "abcdefghijklmn", NULL));
   RESULT(testsnprintf(SHORTBUFFERSIZE, "abcdefghijklmn"));
 
   return 0;
