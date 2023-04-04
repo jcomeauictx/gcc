@@ -31,6 +31,7 @@ int errprintf(const char *format, ...);
 char * memdump(char *buffer, void *location, int count);
 int precheckit(int buffersize, const char *format, void **args);
 int checkit(const char * format, void **args);
+int testsprintf(char *buffer, int size, const char *format, ...);
 
 #define BUFFERSIZE 1024
 #define SHORTBUFFERSIZE 7
@@ -222,6 +223,19 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
     fflush(stdin); \
 } while (0)
 
+int testsprintf(char *buffer, int size, const char *format, ...)
+/* for checking for buffer overruns from macros */
+{
+  int result;
+  va_list args;
+  va_start(args, format);
+  result = sprintf(buffer, size, format, args);
+  va_end(args);
+  printf("%s", buffer);
+  if (buffer[strlen(buffer) - 1] != '\n') printf("\n");
+  return result;
+}
+
 int precheckit(int buffersize, const char *format, void **args)
 {
   int result;
@@ -270,7 +284,6 @@ main (void)
 {
   /* constants needed for some tests below */
   char shortbuffer[SHORTBUFFERSIZE];
-  int result;
   const double PI = M_PI;
   unsigned char *pi = (unsigned char *)&PI;
   const double ONE = 1.0;
@@ -342,8 +355,7 @@ main (void)
   /* now let's test buffer overruns for the various macros used */
   /* first, PRINT_CHAR */
   RESULT(precheckit(SHORTBUFFERSIZE, "abcdefghijklmn", (void *){NULL}));
-  RESULT(result = snprintf(shortbuffer, SHORTBUFFERSIZE, "abcdefghijklmn") &&
-         printf("\n", shortbuffer) && result);
+  RESULT(testsprintf(shortbuffer, SHORTBUFFERSIZE, "abcdefghijklmn"));
 
   return 0;
 }
