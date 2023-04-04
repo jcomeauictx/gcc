@@ -26,11 +26,17 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#include <syslog.h>  /* for debugging */
+
+#define DEFAULT_TYPE double
+#define CAST_ARGS (DEFAULT_TYPE [])
+#define CAST_ARG (DEFAULT_TYPE)
+#define FORCE_CAST (DEFAULT_TYPE)(long)  /* for converting pointers */
 
 int errprintf(const char *format, ...);
 char * memdump(char *buffer, void *location, int count);
-int precheckit(int buffersize, const char *format, double *args);
-int checkit(const char * format, double *args);
+int precheckit(int buffersize, const char *format, DEFAULT_TYPE *args);
+int checkit(const char * format, DEFAULT_TYPE *args);
 int testsnprintf(int size, const char *format, ...);
 
 #define BUFFERSIZE 1024
@@ -59,6 +65,7 @@ int testsnprintf(int size, const char *format, ...);
 #define PRINT_TYPE(TYPE) \
   do { \
     int result; TYPE value; \
+    syslog(LOG_USER | LOG_DEBUG, "current arg: %f\n", CAST_ARG *args); \
     if (index(#TYPE, '*') == strlen(#TYPE) - 1) value = *(TYPE *)(long)args++; \
     else value = *(TYPE *)args++; \
     *sptr++ = *ptr++; /* Copy the type specifier.  */ \
@@ -76,7 +83,7 @@ int testsnprintf(int size, const char *format, ...);
 
 int
 _arraysnprintf (char *formatted, int maxlength, const char *format,
-	       	double *args)
+	       	DEFAULT_TYPE *args)
   /* NOTE that `maxlength` should always be at least 1 less than the size
    * of the `formatted` buffer */
 {
@@ -213,9 +220,6 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
 #endif
 
 #define resultformat "printed %d characters\n"
-#define CAST_ARGS (double [])
-#define CAST_ARG (double)
-#define FORCE_CAST (double)(long)  /* for converting pointers */
 #define RESULT(x) do \
 { \
     int i = (x); \
@@ -239,7 +243,7 @@ int testsnprintf(int size, const char *format, ...)
   return result;
 }
 
-int precheckit(int buffersize, const char *format, double *args)
+int precheckit(int buffersize, const char *format, DEFAULT_TYPE *args)
 {
   int result;
   char formatted[BUFFERSIZE] = "";  /* can't use runtime-supplied size */
@@ -251,7 +255,7 @@ int precheckit(int buffersize, const char *format, double *args)
   return result;
 }
 
-int checkit(const char* format, double *args)
+int checkit(const char* format, DEFAULT_TYPE *args)
 {
   return precheckit(BUFFERSIZE, format, args);
 }
