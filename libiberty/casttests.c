@@ -4,6 +4,6 @@ int main() {
 	double dtest = (double)(long)test;
 	long ltest = (long)dtest;
 	void *vtest = (void *)ltest;
-	printf("test: %s\n", (char *)vtest);
+	printf("test: %p %f %ld \"%s\"\n", test, dtest, ltest, (char *)vtest);
 	return 0;
 }
