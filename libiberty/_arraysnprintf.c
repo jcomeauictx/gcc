@@ -83,11 +83,11 @@ int testsnprintf(int size, const char *format, ...);
   do { \
     int result; TYPE VALUE; \
     syslog(LOG_USER | LOG_DEBUG, \
-        "integer value at PRINT_TYPE: %ld", (DEFAULT_INT_TYPE) VALUE); \
+        "integer value at PRINT_TYPE: %d", VALUE); \
     *sptr++ = *ptr++; /* Copy the type specifier.  */ \
     *sptr = '\0'; /* NULL terminate sptr.  */ \
     result = snprintf(formatted + total_printed, \
-      maxlength - total_printed, specifier, (TYPE)VALUE); \
+      maxlength - total_printed, specifier, (TYPE) VALUE); \
     if (result == -1) \
       return -1; \
     else \
@@ -179,13 +179,13 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
                    as an int and trust the C library printf to cast it
                    to the right width.  */
 		if (short_width)
-		  PRINT_TYPE(int, longvalue);
+		  PRINT_TYPE(long, longvalue);
 		else
 		  {
 		    switch (wide_width)
 		      {
 		      case 0:
-			PRINT_TYPE(int, longvalue);
+			PRINT_TYPE(long, longvalue);
 			break;
 		      case 1:
 			PRINT_TYPE(long, longvalue);
