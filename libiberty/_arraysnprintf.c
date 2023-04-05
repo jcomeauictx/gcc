@@ -65,9 +65,14 @@ int testsnprintf(int size, const char *format, ...);
 #define PRINT_TYPE(TYPE) \
   do { \
     int result; TYPE value; \
-    syslog(LOG_USER | LOG_DEBUG, "current arg: %f\n", CAST_ARG *args); \
-    if (index(#TYPE, '*') == strlen(#TYPE) - 1) value = *(TYPE *)(long)args++; \
-    else value = *(TYPE *)args++; \
+    syslog(LOG_USER | LOG_DEBUG, "current arg: %f\n", *args); \
+    if (index(#TYPE, '*') == strlen(#TYPE) - 1) { \
+      value = (TYPE)(long)args++; \
+      syslog(LOG_USER | LOG_DEBUG, "current %s value: %s\n", #TYPE, value); \
+    } else { \
+      value = *(TYPE *)args++; \
+      syslog(LOG_USER | LOG_DEBUG, "current %s value: %f\n", #TYPE, value); \
+    } \
     *sptr++ = *ptr++; /* Copy the type specifier.  */ \
     *sptr = '\0'; /* NULL terminate sptr.  */ \
     result = snprintf(formatted + total_printed, \
