@@ -66,8 +66,8 @@ int testsnprintf(int size, const char *format, ...);
   do { \
     int result; TYPE value; \
     syslog(LOG_USER | LOG_DEBUG, "current arg: %f\n", *args); \
-    if (index(#TYPE, '*') == strlen(#TYPE) - 1) { \
-      value = (TYPE)(long)args++; \
+    if (index(#TYPE + strlen(#TYPE) - 1, '*') != NULL) { \
+      value = (TYPE)(long)*args++; \
       syslog(LOG_USER | LOG_DEBUG, "current %s value: %s\n", #TYPE, value); \
     } else { \
       value = *(TYPE *)args++; \
