@@ -28,10 +28,12 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 #include <stdlib.h>
 #include <syslog.h>  /* for debugging */
 
-#if defined(__GNUC__) || defined (HAVE_LONG_LONG)
 /* assuming that any architecture that has long longs has long doubles */
+/*
+#if defined(__GNUC__) || defined (HAVE_LONG_LONG)
 #define USE_LONG_LONGS
 #endif
+*/
 
 #ifdef USE_LONG_LONGS
 #define DEFAULT_TYPE long double
