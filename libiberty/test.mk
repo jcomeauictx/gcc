@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 XCFLAGS += -DTEST
-XCFLAGS += -DDISABLE_LONG_LONGS
+#XCFLAGS += -DDISABLE_LONG_LONGS
 all: _doprnt.o _arraysnprintf.o _doprnt.test _arraysnprintf _arraysnprintf.test
 %.o: %.c .FORCE
 	$(MAKE) CFLAGS='$(XCFLAGS)' $@

@@ -217,7 +217,7 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
                 syslog(LOG_USER | LOG_DEBUG,
                   "doublevalue: %Lf (%f)", doublevalue, (double)doublevalue);
 		if (wide_width == 0)
-		  PRINT_TYPE(DEFAULT_TYPE, doublevalue);
+		  PRINT_TYPE(double, doublevalue);
 		else
 		  {
 #ifdef USE_LONG_LONGS
