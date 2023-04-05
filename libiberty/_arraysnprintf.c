@@ -29,6 +29,11 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 #include <syslog.h>  /* for debugging */
 
 #if defined(__GNUC__) || defined (HAVE_LONG_LONG)
+/* assuming that any architecture that has long longs has long doubles */
+#define USE_LONG_LONGS
+#endif
+
+#ifdef USE_LONG_LONGS
 #define DEFAULT_TYPE long double
 #define DEFAULT_INT_TYPE long long
 #else
@@ -38,6 +43,10 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 #define FORCE_CAST (DEFAULT_TYPE)(DEFAULT_INT_TYPE)  /* for pointers */
 #define CAST_ARGS (DEFAULT_TYPE [])
 #define CAST_ARG (DEFAULT_TYPE)
+/* shorthand for building compound literals */
+#define F CAST_ARG
+#define I (DEFAULT_INT_TYPE)
+#define P FORCE_CAST
 
 int errprintf(const char *format, ...);
 char * memdump(char *buffer, void *location, int count);
@@ -95,7 +104,7 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
   const char * ptr = format;
   char specifier[128];
   int total_printed = 0;
-#if defined(__GNUC__) || defined(HAVE_LONG_LONG)
+#ifdef USE_LONG_LONGS
   long long longvalue;
   long double doublevalue;
 #else
@@ -179,7 +188,7 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
 			break;
 		      case 2:
 		      default:
-#if defined(__GNUC__) || defined(HAVE_LONG_LONG)
+#ifdef USE_LONG_LONGS
 			PRINT_TYPE(long long, longvalue);
 #else
                         /* Fake it, hope for the best.  */
@@ -201,7 +210,7 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
 		  PRINT_TYPE(double, doublevalue);
 		else
 		  {
-#if defined(__GNUC__) || defined(HAVE_LONG_DOUBLE)
+#ifdef USE_LONG_LONGS
 		    PRINT_TYPE(long double, doublevalue);
 #else
                     /* Fake it, hope for the best.  */
@@ -309,16 +318,16 @@ main (void)
 {
   /* constants needed for some tests below */
 
-  RESULT(checkit ("<%d>\n", CAST_ARGS {0x12345678}));
+  RESULT(checkit ("<%d>\n", CAST_ARGS {I 0x12345678}));
   RESULT(printf ("<%d>\n", 0x12345678));
 
-  RESULT(checkit ("<%200d>\n", CAST_ARGS {5}));
+  RESULT(checkit ("<%200d>\n", CAST_ARGS {I 5}));
   RESULT(printf ("<%200d>\n", 5));
 
-  RESULT(checkit ("<%.300d>\n", CAST_ARGS {6}));
+  RESULT(checkit ("<%.300d>\n", CAST_ARGS {I 6}));
   RESULT(printf ("<%.300d>\n", 6));
 
-  RESULT(checkit ("<%100.150d>\n", CAST_ARGS {7}));
+  RESULT(checkit ("<%100.150d>\n", CAST_ARGS {I 7}));
   RESULT(printf ("<%100.150d>\n", 7));
 
   RESULT(checkit ("<%s>\n", CAST_ARGS {
@@ -353,21 +362,19 @@ main (void)
                   CAST_ARGS {123, (long)234, 345, 123456789, 456}));
   RESULT(printf ("Testing (hd) short: <%d><%ld><%hd><%hd><%d>\n", 123, (long)234, 345, 123456789, 456));
 
-#if defined(__GNUC__) || defined (HAVE_LONG_LONG)
+#ifdef USE_LONG_LONGS
   RESULT(checkit ("Testing (lld) long long: <%d><%lld><%d>\n", CAST_ARGS 
         {123, 234234234234234234LL, 345}));
   RESULT(printf ("Testing (lld) long long: <%d><%lld><%d>\n", 123, 234234234234234234LL, 345));
   RESULT(checkit ("Testing (Ld) long long: <%d><%Ld><%d>\n", CAST_ARGS
         {123, 234234234234234234LL, 345}));
   RESULT(printf ("Testing (Ld) long long: <%d><%Ld><%d>\n", 123, 234234234234234234LL, 345));
-#endif  /* HAVE_LONG_LONG */
 
-#if defined(__GNUC__) || defined (HAVE_LONG_DOUBLE)
   RESULT(checkit ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		 CAST_ARGS {1.23456, 1.234567890123456789L, 1.23456}));
   RESULT(printf ("Testing (Lf) long double: <%.20f><%.20Lf><%0+#.20f>\n",
 		 1.23456, 1.234567890123456789L, 1.23456));
-#endif  /* HAVE_LONG_DOUBLE */
+#endif  /* USE_LONG_LONGS */
 
   /* now let's test buffer overruns for the various macros used */
   /* first, PRINT_CHAR */
