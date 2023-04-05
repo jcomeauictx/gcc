@@ -81,7 +81,7 @@ int testsnprintf(int size, const char *format, ...);
 
 #define PRINT_TYPE(TYPE, VALUE) \
   do { \
-    int result; TYPE VALUE; \
+    int result; \
     syslog(LOG_USER | LOG_DEBUG, \
         "value at PRINT_TYPE: 0x%x (%d), float: %f", VALUE, VALUE, VALUE); \
     *sptr++ = *ptr++; /* Copy the type specifier.  */ \
