@@ -28,10 +28,16 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 #include <stdlib.h>
 #include <syslog.h>  /* for debugging */
 
+#if defined(__GNUC__) || defined (HAVE_LONG_LONG)
+#define DEFAULT_TYPE long double
+#define DEFAULT_INT_TYPE long long
+#else
 #define DEFAULT_TYPE double
+#define DEFAULT_INT_TYPE long
+#endif
+#define FORCE_CAST (DEFAULT_TYPE)(DEFAULT_INT_TYPE)  /* for pointers */
 #define CAST_ARGS (DEFAULT_TYPE [])
 #define CAST_ARG (DEFAULT_TYPE)
-#define FORCE_CAST (DEFAULT_TYPE)(long)  /* for converting pointers */
 
 int errprintf(const char *format, ...);
 char * memdump(char *buffer, void *location, int count);
@@ -62,21 +68,13 @@ int testsnprintf(int size, const char *format, ...);
    else {total_printed++; ptr++;} \
   } while (0)
 
-#define PRINT_TYPE(TYPE) \
+#define PRINT_TYPE(TYPE, VALUE) \
   do { \
-    int result; TYPE value; \
-    syslog(LOG_USER | LOG_DEBUG, "current arg: %f\n", *args); \
-    if (index(#TYPE + strlen(#TYPE) - 1, '*') != NULL) { \
-      value = (TYPE)(long)*args++; \
-      syslog(LOG_USER | LOG_DEBUG, "current %s value: %s\n", #TYPE, value); \
-    } else { \
-      value = *(TYPE *)args++; \
-      syslog(LOG_USER | LOG_DEBUG, "current %s value: %f\n", #TYPE, value); \
-    } \
+    int result; TYPE VALUE; \
     *sptr++ = *ptr++; /* Copy the type specifier.  */ \
     *sptr = '\0'; /* NULL terminate sptr.  */ \
     result = snprintf(formatted + total_printed, \
-      maxlength - total_printed, specifier, value); \
+      maxlength - total_printed, specifier, VALUE); \
     if (result == -1) \
       return -1; \
     else \
@@ -95,6 +93,13 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
   const char * ptr = format;
   char specifier[128];
   int total_printed = 0;
+#if defined(__GNUC__) || defined(HAVE_LONG_LONG)
+  long long longvalue;
+  long double doublevalue;
+#else
+  long longvalue;
+  double doublevalue;
+#endif
   
   while (*ptr != '\0')
     {
@@ -154,27 +159,29 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
 	    case 'X':
 	    case 'c':
 	      {
+                longvalue = (DEFAULT_INT_TYPE)*args++;
 		/* Short values are promoted to int, so just copy it
                    as an int and trust the C library printf to cast it
                    to the right width.  */
 		if (short_width)
-		  PRINT_TYPE(int);
+		  PRINT_TYPE(int, longvalue);
 		else
 		  {
 		    switch (wide_width)
 		      {
 		      case 0:
-			PRINT_TYPE(int);
+			PRINT_TYPE(int, longvalue);
 			break;
 		      case 1:
-			PRINT_TYPE(long);
+			PRINT_TYPE(long, longvalue);
 			break;
 		      case 2:
 		      default:
 #if defined(__GNUC__) || defined(HAVE_LONG_LONG)
-			PRINT_TYPE(long long);
+			PRINT_TYPE(long long, longvalue);
 #else
-			PRINT_TYPE(long); /* Fake it, hope for the best.  */
+                        /* Fake it, hope for the best.  */
+			PRINT_TYPE(long, longvalue);
 #endif
 			break;
 		      } /* End of switch (wide_width) */
@@ -187,23 +194,27 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
 	    case 'g':
 	    case 'G':
 	      {
+                doublevalue = (DEFAULT_TYPE)*args++;
 		if (wide_width == 0)
-		  PRINT_TYPE(double);
+		  PRINT_TYPE(double, doublevalue);
 		else
 		  {
 #if defined(__GNUC__) || defined(HAVE_LONG_DOUBLE)
-		    PRINT_TYPE(long double);
+		    PRINT_TYPE(long double, doublevalue);
 #else
-		    PRINT_TYPE(double); /* Hope for the best.  */
+                    /* Fake it, hope for the best.  */
+		    PRINT_TYPE(double, doublevalue);
 #endif
 		  }
 	      }
 	      break;
 	    case 's':
-	      PRINT_TYPE(char *);
+              longvalue = (DEFAULT_INT_TYPE)*args++;
+	      PRINT_TYPE(char *, longvalue);
 	      break;
 	    case 'p':
-	      PRINT_TYPE(void *);
+              longvalue = (DEFAULT_INT_TYPE)*args++;
+	      PRINT_TYPE(void *, longvalue);
 	      break;
 	    case '%':
 	      PRINT_CHAR('%');
