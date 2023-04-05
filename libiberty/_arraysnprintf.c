@@ -74,7 +74,7 @@ int testsnprintf(int size, const char *format, ...);
     *sptr++ = *ptr++; /* Copy the type specifier.  */ \
     *sptr = '\0'; /* NULL terminate sptr.  */ \
     result = snprintf(formatted + total_printed, \
-      maxlength - total_printed, specifier, VALUE); \
+      maxlength - total_printed, specifier, (TYPE)VALUE); \
     if (result == -1) \
       return -1; \
     else \
