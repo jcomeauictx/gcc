@@ -172,7 +172,9 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
 	    case 'X':
 	    case 'c':
 	      {
-                longvalue = (DEFAULT_INT_TYPE)*args++;
+                longvalue = (DEFAULT_INT_TYPE) *args++;
+                syslog(LOG_USER | LOG_DEBUG,
+                    "longvalue: 0x%x (%d)", longvalue, longvalue);
 		/* Short values are promoted to int, so just copy it
                    as an int and trust the C library printf to cast it
                    to the right width.  */
@@ -207,7 +209,7 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
 	    case 'g':
 	    case 'G':
 	      {
-                doublevalue = (DEFAULT_TYPE)*args++;
+                doublevalue = (DEFAULT_TYPE) *args++;
 		if (wide_width == 0)
 		  PRINT_TYPE(double, doublevalue);
 		else
@@ -222,11 +224,11 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
 	      }
 	      break;
 	    case 's':
-              longvalue = (DEFAULT_INT_TYPE)*args++;
+              longvalue = (DEFAULT_INT_TYPE) *args++;
 	      PRINT_TYPE(char *, longvalue);
 	      break;
 	    case 'p':
-              longvalue = (DEFAULT_INT_TYPE)*args++;
+              longvalue = (DEFAULT_INT_TYPE) *args++;
 	      PRINT_TYPE(void *, longvalue);
 	      break;
 	    case '%':
@@ -248,13 +250,13 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
 #define M_PI (3.1415926535897932385)
 #endif
 
-#define resultformat "printed %d characters\n"
+#define RESULTFORMAT "printed %d characters\n"
 #define RESULT(x) do \
 { \
     int i = (x); \
     if (strstr(#x, "checkit") != NULL) \
-      checkit(resultformat, CAST_ARGS{i}); \
-    else printf(resultformat, i); \
+      checkit(RESULTFORMAT, CAST_ARGS{i}); \
+    else printf(RESULTFORMAT, i); \
     fflush(stdin); \
 } while (0)
 
@@ -320,20 +322,20 @@ main (void)
 {
   /* constants needed for some tests below */
 
-  RESULT(checkit ("<%d>\n", CAST_ARGS {I 0x12345678}));
+  RESULT(checkit ("<%d>\n", CAST_ARGS {0x12345678}));
   RESULT(printf ("<%d>\n", 0x12345678));
 
-  RESULT(checkit ("<%200d>\n", CAST_ARGS {I 5}));
+  RESULT(checkit ("<%200d>\n", CAST_ARGS {5}));
   RESULT(printf ("<%200d>\n", 5));
 
-  RESULT(checkit ("<%.300d>\n", CAST_ARGS {I 6}));
+  RESULT(checkit ("<%.300d>\n", CAST_ARGS {6}));
   RESULT(printf ("<%.300d>\n", 6));
 
-  RESULT(checkit ("<%100.150d>\n", CAST_ARGS {I 7}));
+  RESULT(checkit ("<%100.150d>\n", CAST_ARGS {7}));
   RESULT(printf ("<%100.150d>\n", 7));
 
   RESULT(checkit ("<%s>\n", CAST_ARGS {
-    FORCE_CAST "jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
+    FORCE_CAST"jjjjjjjjjiiiiiiiiiiiiiiioooooooooooooooooppppppppppppaa\n\
     777777777777777777333333333333366666666666622222222222777777777777733333"
   }));
   RESULT(printf ("<%s>\n",
@@ -342,8 +344,8 @@ main (void)
   ));
 
   RESULT(checkit ("<%f><%0+#f>%s%d%s>\n", CAST_ARGS {
-		  1.0, 1.0, FORCE_CAST "foo", 77,
-		   FORCE_CAST "asdjffffffffffffffiiiiiiiiiiixxxxx"}));
+		  1.0, 1.0, FORCE_CAST"foo", 77,
+		  FORCE_CAST"asdjffffffffffffffiiiiiiiiiiixxxxx"}));
   RESULT(printf ("<%f><%0+#f>%s%d%s>\n",
 		 1.0, 1.0, "foo", 77, "asdjffffffffffffffiiiiiiiiiiixxxxx"));
 
