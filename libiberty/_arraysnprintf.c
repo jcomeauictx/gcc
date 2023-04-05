@@ -83,7 +83,7 @@ int testsnprintf(int size, const char *format, ...);
   do { \
     int result; TYPE VALUE; \
     syslog(LOG_USER | LOG_DEBUG, \
-        "integer value at PRINT_TYPE: %d", VALUE); \
+        "value at PRINT_TYPE: 0x%x (%d), float: %f", VALUE, VALUE, VALUE); \
     *sptr++ = *ptr++; /* Copy the type specifier.  */ \
     *sptr = '\0'; /* NULL terminate sptr.  */ \
     result = snprintf(formatted + total_printed, \
@@ -179,24 +179,24 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
                    as an int and trust the C library printf to cast it
                    to the right width.  */
 		if (short_width)
-		  PRINT_TYPE(long, longvalue);
+		  PRINT_TYPE(DEFAULT_INT_TYPE, longvalue);
 		else
 		  {
 		    switch (wide_width)
 		      {
 		      case 0:
-			PRINT_TYPE(long, longvalue);
+			PRINT_TYPE(DEFAULT_INT_TYPE, longvalue);
 			break;
 		      case 1:
-			PRINT_TYPE(long, longvalue);
+			PRINT_TYPE(DEFAULT_INT_TYPE, longvalue);
 			break;
 		      case 2:
 		      default:
 #ifdef USE_LONG_LONGS
-			PRINT_TYPE(long long, longvalue);
+			PRINT_TYPE(DEFAULT_INT_TYPE, longvalue);
 #else
                         /* Fake it, hope for the best.  */
-			PRINT_TYPE(long, longvalue);
+			PRINT_TYPE(DEFAULT_INT_TYPE, longvalue);
 #endif
 			break;
 		      } /* End of switch (wide_width) */
@@ -211,14 +211,14 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
 	      {
                 doublevalue = (DEFAULT_TYPE) *args++;
 		if (wide_width == 0)
-		  PRINT_TYPE(double, doublevalue);
+		  PRINT_TYPE(DEFAULT_TYPE, doublevalue);
 		else
 		  {
 #ifdef USE_LONG_LONGS
-		    PRINT_TYPE(long double, doublevalue);
+		    PRINT_TYPE(DEFAULT_TYPE, doublevalue);
 #else
                     /* Fake it, hope for the best.  */
-		    PRINT_TYPE(double, doublevalue);
+		    PRINT_TYPE(DEFAULT_TYPE, doublevalue);
 #endif
 		  }
 	      }
