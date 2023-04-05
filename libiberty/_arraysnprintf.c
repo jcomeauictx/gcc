@@ -26,12 +26,18 @@ Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#ifdef SYSLOG_DEBUGGING
 #include <syslog.h>  /* for debugging */
+#else
+#define syslog(...)
+#endif
 
 /* assuming that any architecture that has long longs has long doubles */
+#if !defined(DISABLE_LONG_LONGS)
 #if defined(__GNUC__) || defined (HAVE_LONG_LONG)
 #define USE_LONG_LONGS
-#endif
+#endif  /* HAVE_LONG_LONG */
+#endif /* DISABLE_LONG_LONG */
 
 #ifdef USE_LONG_LONGS
 #define DEFAULT_TYPE long double
