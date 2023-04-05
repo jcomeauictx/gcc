@@ -208,6 +208,8 @@ _arraysnprintf (char *formatted, int maxlength, const char *format,
 	    case 'G':
 	      {
                 doublevalue = (DEFAULT_TYPE) *args++;
+                syslog(LOG_USER | LOG_DEBUG,
+                  "doublevalue: %Lf (%f)", doublevalue, (double)doublevalue);
 		if (wide_width == 0)
 		  PRINT_TYPE(DEFAULT_TYPE, doublevalue);
 		else
