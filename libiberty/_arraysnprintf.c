@@ -71,6 +71,8 @@ int testsnprintf(int size, const char *format, ...);
 #define PRINT_TYPE(TYPE, VALUE) \
   do { \
     int result; TYPE VALUE; \
+    syslog(LOG_USER | LOG_DEBUG, \
+        "integer value at PRINT_TYPE: %ld", (DEFAULT_INT_TYPE) VALUE); \
     *sptr++ = *ptr++; /* Copy the type specifier.  */ \
     *sptr = '\0'; /* NULL terminate sptr.  */ \
     result = snprintf(formatted + total_printed, \
